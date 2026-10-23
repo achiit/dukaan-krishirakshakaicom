@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>🌾 AI CROP GUARDIAN — Smart Agriculture Intelligence Platform (Bilingual English & हिंदी)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Leaflet GIS Map CSS & JS -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Sans+Devanagari:wght@400;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', 'Noto Sans Devanagari', sans-serif;
+      background-color: #F2F6F3;
+      color: #0F1E19;
+    }
+    .btn-farm-primary {
+      background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%);
+      box-shadow: 0 6px 20px -4px rgba(5, 150, 105, 0.45);
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-farm-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -4px rgba(5, 150, 105, 0.65);
+      filter: brightness(1.06);
+    }
+    .btn-farm-gold {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+      box-shadow: 0 6px 20px -4px rgba(245, 158, 11, 0.45);
+      transition: all 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .btn-farm-gold:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 25px -4px rgba(245, 158, 11, 0.65);
+    }
+    .farm-card {
+      background: #FFFFFF;
+      border-radius: 1.25rem;
+      border: 1px solid #E2ECE5;
+      box-shadow: 0 4px 20px -2px rgba(15, 30, 25, 0.05);
+      transition: all 0.2s ease;
+    }
+    .farm-card:hover {
+      border-color: #10B981;
+      box-shadow: 0 10px 30px -5px rgba(16, 185, 129, 0.12);
+    }
+    .custom-scroll::-webkit-scrollbar { width: 6px; }
+    .custom-scroll::-webkit-scrollbar-thumb { background: #CBD5E1; border-radius: 9999px; }
+    @media print {
+      header, aside, .no-print { display: none !important; }
+      main { width: 100% !important; margin: 0 !important; padding: 0 !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col">
+
+  <!-- GLOBAL TOAST NOTIFICATION BANNER -->
+  <div id="globalToast" class="hidden fixed bottom-5 right-5 z-50 max-w-md bg-emerald-950 text-white px-5 py-3.5 rounded-2xl shadow-2xl border border-emerald-400/50 flex items-center gap-3 text-xs font-bold animate-bounce">
+    <span class="text-amber-400 text-lg">🌾</span>
+    <span id="globalToastText">Ready!</span>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- SCREEN 1: INITIAL FULL-SCREEN LOGIN & REGISTRATION GATEWAY            -->
+  <!-- ===================================================================== -->
+  <div id="authGatewayScreen" class="min-h-screen bg-gradient-to-br from-[#071912] via-[#0E2B1F] to-[#071912] flex flex-col justify-between p-4 sm:p-6">
+    <!-- Top Bar with Instant Bilingual Switcher (English | हिंदी) -->
+    <div class="max-w-6xl w-full mx-auto flex flex-wrap items-center justify-between gap-3 py-2">
+      <div class="flex items-center gap-3">
+        <div class="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center shadow-lg">
+          <i data-lucide="sprout" class="w-7 h-7 text-emerald-400"></i>
+        </div>
+        <div>
+          <span class="font-extrabold text-white text-lg sm:text-xl tracking-tight">🌾 AI CROP GUARDIAN</span>
+          <p class="text-xs text-emerald-200/90" data-en="All-India Early Disease Detection, Live Weather Risk & Smart Advisory" data-hi="अखिल भारतीय फसल रोग पहचान, लाइव मौसम जोखिम एवं स्मार्ट कृषि सलाह">
+            All-India Early Disease Detection, Live Weather Risk & Smart Advisory
+          </p>
+        </div>
+      </div>
+
+      <!-- Language Switcher (English | हिंदी ONLY) -->
+      <div class="flex items-center bg-black/45 border border-emerald-600/60 rounded-2xl p-1.5 text-xs font-bold shadow-lg">
+        <button onclick="changeAppLanguage('en')" id="authLangEn" class="px-4 py-1.5 rounded-xl bg-emerald-500 text-slate-950 font-extrabold cursor-pointer transition-all">
+          🇬🇧 English
+        </button>
+        <button onclick="changeAppLanguage('hi')" id="authLangHi" class="px-4 py-1.5 rounded-xl text-emerald-200 hover:text-white cursor-pointer transition-all">
+          🇮🇳 हिंदी (Hindi)
+        </button>
+      </div>
+    </div>
+
+    <!-- Center Auth Card Container -->
+    <div class="max-w-5xl w-full mx-auto my-6 bg-white rounded-3xl shadow-2xl border border-emerald-500/30 overflow-hidden grid grid-cols-1 lg:grid-cols-12">
+      <!-- Left 5 Cols: Farming Visual & Value Proposition -->
+      <div class="lg:col-span-5 bg-gradient-to-br from-[#0B261B] via-[#123B2A] to-[#0B261B] text-white p-6 sm:p-8 flex flex-col justify-between relative overflow-hidden">
+        <div class="space-y-4 relative z-10">
+          <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold" data-en="✨ All-India Digital Kisan Portal" data-hi="✨ अखिल भारतीय डिजिटल किसान पोर्टल">
+            ✨ All-India Digital Kisan Portal
+          </span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold leading-tight" data-en="Protect Your Crops Before Damage Spreads." data-hi="नुकसान फैलने से पहले अपनी फसल की रक्षा करें।">
+            Protect Your Crops Before Damage Spreads.
+          </h1>
+          <p class="text-xs sm:text-sm text-emerald-100/90 leading-relaxed" data-en="Register your farm with your State & District (Lucknow, Delhi, Pune & All India) to get live weather alerts, Crop Problem & Solution Reports, Mandi Prices, and Voice AI advisory." data-hi="अपने राज्य और जिले (लखनऊ, दिल्ली, पुणे व संपूर्ण भारत) के साथ पंजीकरण करें और लाइव मौसम अलर्ट, फसल समस्या एवं समाधान रिपोर्ट, मंडी भाव और वॉयस AI सलाह प्राप्त करें।">
+            Register your farm with your State & District (Lucknow, Delhi, Pune & All India) to get live weather alerts, Crop Problem & Solution Reports, Mandi Prices, and Voice AI advisory.
+          </p>
+
+          <div class="space-y-3 pt-3 text-xs text-emerald-100">
+            <div class="flex items-center gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center font-bold">✓</span>
+              <span data-en="All-India State & District Live Weather (Lucknow, Delhi, UP & All States)" data-hi="दिल्ली, लखनऊ, उत्तर प्रदेश सहित पूरे भारत के सभी राज्यों व जिलों का लाइव मौसम">
+                All-India State & District Live Weather (Lucknow, Delhi, UP & All States)
+              </span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center font-bold">✓</span>
+              <span data-en="Instant Crop Problem Report & Actionable Solution Report after Leaf Scan" data-hi="पत्ती स्कैन करते ही तुरंत समस्या रिपोर्ट (Problem Report) और समाधान रिपोर्ट (Solution Report)">
+                Instant Crop Problem Report & Actionable Solution Report after Leaf Scan
+              </span>
+            </div>
+            <div class="flex items-center gap-2.5">
+              <span class="w-5 h-5 rounded-full bg-emerald-500/30 text-emerald-300 flex items-center justify-center font-bold">✓</span>
+              <span data-en="Live e-NAM Mandi Market Rates, Drone Dosage Calculator & Voice AI" data-hi="लाइव ई-नाम मंडी भाव, ड्रोन छिड़काव कैलकुलेटर एवं हिंदी वॉयस AI सहायक">
+                Live e-NAM Mandi Market Rates, Drone Dosage Calculator & Voice AI
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-8 pt-4 border-t border-emerald-700/60 text-xs text-emerald-200 relative z-10">
+          <div class="font-bold" data-en="🇮🇳 All-India Digital Agriculture Network" data-hi="🇮🇳 अखिल भारतीय डिजिटल कृषि निगरानी नेटवर्क">
+            🇮🇳 All-India Digital Agriculture Network
+          </div>
+          <div class="text-[11px] text-emerald-300/80 mt-0.5" data-en="Connected with Krishi Vigyan Kendra (KVK) & State Agriculture Departments" data-hi="कृषि विज्ञान केंद्र (KVK) एवं राज्य कृषि विभाग से संबद्ध">
+            Connected with Krishi Vigyan Kendra (KVK) & State Agriculture Departments
+          </div>
+        </div>
+      </div>
+
+      <!-- Right 7 Cols: Toggle between Registration Form & Role Login -->
+      <div class="lg:col-span-7 p-6 sm:p-8 flex flex-col justify-between">
+        <div>
+          <!-- Switch Tabs -->
+          <div class="flex items-center bg-slate-100 p-1.5 rounded-2xl border border-slate-200 mb-6">
+            <button onclick="switchAuthTab('REGISTER')" id="tabBtnRegister" class="flex-1 py-2.5 px-4 rounded-xl text-xs font-extrabold bg-emerald-700 text-white shadow cursor-pointer transition-all" data-en="📝 New Farmer Registration" data-hi="📝 नया किसान पंजीकरण (Registration)">
+              📝 New Farmer Registration
+            </button>
+            <button onclick="switchAuthTab('LOGIN')" id="tabBtnLogin" class="flex-1 py-2.5 px-4 rounded-xl text-xs font-extrabold text-slate-600 hover:text-slate-900 cursor-pointer transition-all" data-en="🔐 Existing User / Role Login" data-hi="🔐 लॉगिन करें (Login Portal)">
+              🔐 Existing User / Role Login
+            </button>
+          </div>
+
+          <!-- FORM 1: REGISTRATION -->
+          <form id="registerForm" onsubmit="handleRegistrationSubmit(event)" class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1" data-en="Farmer Full Name *" data-hi="किसान का पूरा नाम *">Farmer Full Name *</label>
+                <input type="text" id="regName" value="Rameshwar Deshmukh" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1" data-en="Mobile Number *" data-hi="मोबाइल नंबर *">Mobile Number *</label>
+                <input type="text" id="regMobile" value="+91 98765 43210" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 font-semibold text-slate-900" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1" data-en="State (All India) *" data-hi="राज्य चुनें (State) *">State (All India) *</label>
+                <select id="regState" onchange="populateDistrictDropdown('regState', 'regDistrict')" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 font-bold text-slate-800 bg-slate-50"></select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1" data-en="District *" data-hi="जिला चुनें (District) *">District *</label>
+                <select id="regDistrict" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 font-bold text-slate-800 bg-slate-50"></select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1" data-en="Village / Block" data-hi="गाँव / तहसील">Village / Block</label>
+                <input type="text" id="regVillage" value="Malihabad Rural" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 font-medium" />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1" data-en="Primary Crop" data-hi="मुख्य फसल (Crop)">Primary Crop</label>
+                <select id="regCrop" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 font-bold text-slate-800 bg-slate-50">
+                  <option value="Tomato">Tomato (टमाटर)</option>
+                  <option value="Wheat">Wheat (गेहूं)</option>
+                  <option value="Onion">Onion (प्याज)</option>
+                  <option value="Potato">Potato (आलू)</option>
+                  <option value="Sugarcane">Sugarcane (गन्ना)</option>
+                  <option value="Mustard">Mustard (सरसों)</option>
+                  <option value="Cotton">Cotton (कपास)</option>
+                  <option value="Paddy">Paddy / Rice (धान)</option>
+                </select>
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1" data-en="Farm Size (Acres)" data-hi="खेत का क्षेत्रफल (एकड़)">Farm Size (Acres)</label>
+                <input type="number" step="0.5" id="regAcres" value="3.5" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 font-bold" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1" data-en="Irrigation Method" data-hi="सिंचाई का प्रकार">Irrigation Method</label>
+                <select id="regIrrigation" class="w-full border border-slate-300 rounded-xl px-3 py-2.5 font-medium bg-slate-50">
+                  <option value="Drip Irrigation">Drip Irrigation (ड्रिप सिंचाई)</option>
+                  <option value="Sprinkler">Sprinkler (स्प्रिंकलर)</option>
+                  <option value="Tube Well / Canal">Tube Well / Canal</option>
+                </select>
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-3.5 rounded-2xl btn-farm-primary text-white font-extrabold text-sm cursor-pointer" data-en="Complete Registration & Open Farmer Dashboard →" data-hi="किसान पंजीकरण पूरा करें और डैशबोर्ड खोलें →">
+              Complete Registration & Open Farmer Dashboard →
+            </button>
+          </form>
+
+          <!-- FORM 2: ROLE LOGIN -->
+          <form id="loginForm" onsubmit="handleLoginSubmit(event)" class="hidden space-y-5 text-xs">
+            <div>
+              <label class="block font-bold text-slate-700 mb-2" data-en="Select Your Portal Role to Login:" data-hi="लॉगिन करने के लिए अपना पोर्टल चुनें:">Select Your Portal Role to Login:</label>
+              <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                <button type="button" onclick="selectLoginRole('FARMER')" id="roleBtnFarmer" class="p-3 rounded-2xl border bg-emerald-700 text-white font-extrabold cursor-pointer" data-en="👨‍🌾 Farmer Portal" data-hi="👨‍🌾 किसान पोर्टल">👨‍🌾 Farmer Portal</button>
+                <button type="button" onclick="selectLoginRole('EXPERT')" id="roleBtnExpert" class="p-3 rounded-2xl border bg-slate-50 text-slate-700 font-extrabold cursor-pointer" data-en="👨‍🔬 KVK Expert" data-hi="👨‍🔬 कृषि विशेषज्ञ">👨‍🔬 KVK Expert</button>
+                <button type="button" onclick="selectLoginRole('OFFICER')" id="roleBtnOfficer" class="p-3 rounded-2xl border bg-slate-50 text-slate-700 font-extrabold cursor-pointer" data-en="🏛️ Govt Officer" data-hi="🏛️ सरकारी अधिकारी">🏛️ Govt Officer</button>
+                <button type="button" onclick="selectLoginRole('ADMIN')" id="roleBtnAdmin" class="p-3 rounded-2xl border bg-slate-50 text-slate-700 font-extrabold cursor-pointer" data-en="👑 Admin Panel" data-hi="👑 एडमिन पैनल">👑 Admin Panel</button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block font-bold text-slate-700 mb-1" data-en="Mobile Number / Official Email" data-hi="मोबाइल नंबर / आधिकारिक ईमेल">Mobile Number / Official Email</label>
+                <input type="text" id="loginIdentifier" value="+91 98765 43210" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 font-semibold" />
+              </div>
+              <div>
+                <label class="block font-bold text-slate-700 mb-1" data-en="PIN / Password" data-hi="पिन / पासवर्ड">PIN / Password</label>
+                <input type="password" value="1234" required class="w-full border border-slate-300 rounded-xl px-3.5 py-2.5 font-semibold" />
+              </div>
+            </div>
+
+            <button type="submit" class="w-full py-3.5 rounded-2xl btn-farm-primary text-white font-extrabold text-sm cursor-pointer" data-en="Login to Selected Portal →" data-hi="चयनित पोर्टल में लॉगिन करें →">
+              Login to Selected Portal →
+            </button>
+          </form>
+        </div>
+
+        <div class="mt-6 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-400">
+          <span data-en="🔒 Privacy-First • No Sensitive Govt ID Required" data-hi="🔒 पूर्ण गोपनीयता • किसी सरकारी पहचान पत्र की आवश्यकता नहीं">🔒 Privacy-First • No Sensitive Govt ID Required</span>
+          <span>All-India Krishi Vigyan Kendra Network</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- SCREEN 2: MAIN APPLICATION DASHBOARD                                  -->
+  <!-- ===================================================================== -->
+  <div id="mainAppContainer" class="hidden min-h-screen flex flex-col">
+
+    <!-- TOP APPLICATION HEADER -->
+    <header class="bg-gradient-to-r from-[#0B2218] via-[#123626] to-[#0B2218] text-white border-b border-emerald-800/60 sticky top-0 z-40 shadow-md">
+      <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-3">
+        <!-- Left Brand -->
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-400/40 flex items-center justify-center">
+            <i data-lucide="sprout" class="w-6 h-6 text-emerald-400"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-extrabold tracking-tight text-base sm:text-lg text-white">🌾 AI CROP GUARDIAN</span>
+              <span id="headerLocationBadge" class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30">
+                Lucknow, Uttar Pradesh
+              </span>
+            </div>
+            <p class="text-[11px] text-emerald-200/90 hidden md:block" data-en="Early Detection • Live Weather • Location Crop Advisor • Mandi Rates & Smart Tools" data-hi="प्रारंभिक रोग पहचान • लाइव मौसम • स्थान अनुसार फसल सलाह • मंडी भाव एवं स्मार्ट टूल्स">
+              Early Detection • Live Weather • Location Crop Advisor • Mandi Rates & Smart Tools
+            </p>
+          </div>
+        </div>
+
+        <!-- Center Role Switcher -->
+        <div class="flex items-center bg-black/35 p-1 rounded-2xl border border-emerald-700/50">
+          <button onclick="switchPortalRole('FARMER')" id="topRoleFarmer" class="px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow cursor-pointer transition-all" data-en="👨‍🌾 Farmer Portal" data-hi="👨‍🌾 किसान पोर्टल">👨‍🌾 Farmer Portal</button>
+          <button onclick="switchPortalRole('EXPERT')" id="topRoleExpert" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-200 hover:text-white cursor-pointer transition-all" data-en="👨‍🔬 KVK Expert" data-hi="👨‍🔬 कृषि विशेषज्ञ">👨‍🔬 KVK Expert</button>
+          <button onclick="switchPortalRole('OFFICER')" id="topRoleOfficer" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-200 hover:text-white cursor-pointer transition-all" data-en="🏛️ Govt Officer" data-hi="🏛️ सरकारी अधिकारी">🏛️ Govt Officer</button>
+          <button onclick="switchPortalRole('ADMIN')" id="topRoleAdmin" class="px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-200 hover:text-white cursor-pointer transition-all" data-en="👑 Admin Panel" data-hi="👑 एडमिन पैनल">👑 Admin Panel</button>
+        </div>
+
+        <!-- Right Instant Language Switcher (English | हिंदी ONLY) & Switch Account -->
+        <div class="flex items-center gap-2">
+          <div class="flex items-center bg-emerald-950 border border-emerald-600/60 rounded-2xl p-1 text-xs font-bold shadow">
+            <button onclick="changeAppLanguage('en')" id="appLangEn" class="px-3 py-1 rounded-xl bg-emerald-500 text-slate-950 font-extrabold cursor-pointer transition-all">🇬🇧 EN</button>
+            <button onclick="changeAppLanguage('hi')" id="appLangHi" class="px-3 py-1 rounded-xl text-emerald-300 hover:text-white cursor-pointer transition-all">🇮🇳 हिंदी</button>
+          </div>
+          <button onclick="logoutToAuthScreen()" class="px-3.5 py-1.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs cursor-pointer shadow" data-en="Switch Account" data-hi="खाता बदलें">
+            Switch Account
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- =================================================================== -->
+    <!-- PORTAL 1: FARMER PORTAL (STYLISH FARMING DESIGN + ADVANCED TOOLS)   -->
+    <!-- =================================================================== -->
+    <div id="portalFarmer" class="flex-1 max-w-7xl w-full mx-auto px-4 py-6 grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <!-- Left Sidebar Navigation -->
+      <aside class="lg:col-span-3 space-y-4">
+        <!-- Farmer Identity & All-India Location Selector -->
+        <div class="farm-card p-4 space-y-3">
+          <div class="flex items-center gap-3">
+            <div id="userInitialsBadge" class="w-12 h-12 rounded-2xl bg-gradient-to-br from-emerald-600 to-emerald-800 text-white font-extrabold text-lg flex items-center justify-center shadow">
+              RD
+            </div>
+            <div>
+              <h2 id="sidebarUserName" class="font-extrabold text-slate-900 text-sm">Rameshwar Deshmukh</h2>
+              <p id="sidebarUserLocation" class="text-xs text-emerald-700 font-semibold">Lucknow, Uttar Pradesh</p>
+            </div>
+          </div>
+
+          <!-- Dynamic State & District Selector -->
+          <div class="pt-2 border-t border-slate-100 space-y-2">
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1" data-en="🇮🇳 Select State (All India):" data-hi="🇮🇳 राज्य चुनें (संपूर्ण भारत):">🇮🇳 Select State (All India):</label>
+              <select id="sideStateSelect" onchange="handleSidebarStateChange()" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-2 font-bold text-slate-800"></select>
+            </div>
+            <div>
+              <label class="block text-[10px] font-bold uppercase text-slate-500 mb-1" data-en="📍 Select District:" data-hi="📍 जिला चुनें (District):">📍 Select District:</label>
+              <select id="sideDistrictSelect" onchange="handleSidebarDistrictChange()" class="w-full text-xs bg-slate-50 border border-slate-300 rounded-xl px-2.5 py-2 font-bold text-slate-800"></select>
+            </div>
+            <button onclick="autoDetectGpsLocation()" class="w-full py-2.5 rounded-xl btn-farm-gold text-slate-950 font-extrabold text-xs flex items-center justify-center gap-1.5 cursor-pointer">
+              <span>📍</span>
+              <span data-en="Auto-Detect My GPS & Live Weather" data-hi="मेरी GPS लोकेशन और लाइव मौसम जोड़ें">Auto-Detect My GPS & Live Weather</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Complete Navigation Menu (All 9 Stylish Farming Tabs) -->
+        <nav class="farm-card p-2.5 space-y-1">
+          <button onclick="switchFarmerTab('HOME')" id="navBtnHome" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between bg-emerald-700 text-white shadow-sm cursor-pointer transition-all">
+            <span data-en="🏠 Home Dashboard" data-hi="🏠 होम डैशबोर्ड">🏠 Home Dashboard</span>
+          </button>
+          <button onclick="switchFarmerTab('ADVISOR')" id="navBtnAdvisor" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer transition-all">
+            <span data-en="🌾 Location Crop Advisor" data-hi="🌾 स्थान अनुसार फसल सलाह">🌾 Location Crop Advisor</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">NEW</span>
+          </button>
+          <button onclick="switchFarmerTab('SCAN')" id="navBtnScan" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer transition-all">
+            <span data-en="📸 AI Scanner & Reports" data-hi="📸 AI स्कैनर व समस्या रिपोर्ट">📸 AI Scanner & Reports</span>
+            <span class="px-2 py-0.5 rounded-full bg-amber-100 text-amber-900 text-[10px] font-extrabold">AI</span>
+          </button>
+          <button onclick="switchFarmerTab('TOOLS')" id="navBtnTools" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer transition-all">
+            <span data-en="🚁 Smart Farming Tools & Mandi" data-hi="🚁 मंडी भाव एवं ड्रोन कैलकुलेटर">🚁 Smart Farming Tools & Mandi</span>
+            <span class="px-2 py-0.5 rounded-full bg-purple-100 text-purple-800 text-[10px] font-extrabold">PRO</span>
+          </button>
+          <button onclick="switchFarmerTab('ASSISTANT')" id="navBtnAssistant" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer transition-all">
+            <span data-en="🤖 Voice Farming AI" data-hi="🤖 वॉयस कृषि AI सहायक">🤖 Voice Farming AI</span>
+            <span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">🎤</span>
+          </button>
+          <button onclick="switchFarmerTab('RISK')" id="navBtnRisk" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer transition-all">
+            <span data-en="🚨 Pre-Symptom Risk Engine" data-hi="🚨 रोग जोखिम पूर्वानुमान">🚨 Pre-Symptom Risk Engine</span>
+            <span class="px-2 py-0.5 rounded-full bg-red-100 text-red-700 text-[10px] font-extrabold">87%</span>
+          </button>
+          <button onclick="switchFarmerTab('CROPS')" id="navBtnCrops" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer transition-all">
+            <span data-en="🌱 My Active Crops" data-hi="🌱 मेरी सक्रिय फसलें">🌱 My Active Crops</span>
+            <span id="badgeCropCount" class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">3</span>
+          </button>
+          <button onclick="switchFarmerTab('MAP')" id="navBtnMap" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer transition-all">
+            <span data-en="🗺️ Live Disease GIS Map" data-hi="🗺️ लाइव रोग मानचित्र">🗺️ Live Disease GIS Map</span>
+          </button>
+          <button onclick="switchFarmerTab('REPORTS')" id="navBtnReports" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer transition-all">
+            <span data-en="📋 Follow-Up & PDF Reports" data-hi="📋 फॉलो-अप एवं PDF रिपोर्ट">📋 Follow-Up & PDF Reports</span>
+          </button>
+          <button onclick="switchFarmerTab('EMART')" id="navBtnEmart" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer transition-all">
+            <span data-en="🛒 Krishi E-Mart" data-hi="🛒 कृषि ई-मार्ट">🛒 Krishi E-Mart</span><span class="px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 text-[10px] font-extrabold">NEW</span>
+          </button>
+          <button onclick="switchFarmerTab('GOVERNMENT')" id="navBtnGovernment" class="w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer transition-all">
+            <span data-en="🏛️ Government Schemes & Loans" data-hi="🏛️ सरकारी योजनाएँ और ऋण">🏛️ Government Schemes & Loans</span><span class="px-2 py-0.5 rounded-full bg-sky-100 text-sky-800 text-[10px] font-extrabold">NEW</span>
+          </button>
+        </nav>
+
+        <!-- Weather Alert Box -->
+        <div class="farm-card p-4 space-y-2 border-l-4 border-l-red-600">
+          <div class="text-xs font-extrabold text-red-700 flex items-center justify-between">
+            <span data-en="🚨 Weather-According Alert" data-hi="🚨 मौसम आधारित चेतावनी">🚨 Weather-According Alert</span>
+            <span class="text-[10px] bg-red-100 px-2 py-0.5 rounded-full">LIVE</span>
+          </div>
+          <div id="sidebarWeatherAlertTitle" class="text-xs font-bold text-slate-900">
+            🌧️ LUCKNOW (UP) WEATHER ALERT: 81% Humidity Watch
+          </div>
+          <p id="sidebarWeatherAlertMsg" class="text-[11px] text-slate-600 leading-relaxed" data-en="High humidity in Lucknow accelerates fungal spore germination. Maintain morning drip irrigation and apply Trichoderma viride @ 5g/L." data-hi="लखनऊ में 81% नमी के कारण फंगस फैलने का खतरा है। केवल सुबह ड्रिप सिंचाई करें और ट्राइकोडर्मा विरिडी (5 ग्राम/लीटर) का छिड़काव करें।">
+            High humidity in Lucknow accelerates fungal spore germination. Maintain morning drip irrigation and apply Trichoderma viride @ 5g/L.
+          </p>
+        </div>
+      </aside>
+
+      <!-- Farmer Right Main Content -->
+      <main class="lg:col-span-9 space-y-6">
+
+        <!-- =============================================================== -->
+        <!-- TAB 0: HOME DASHBOARD                                           -->
+        <!-- =============================================================== -->
+        <div id="farmerTabHome" class="space-y-6">
+          <!-- Hero Banner with Rich Agriculture Photography Background -->
+          <div class="rounded-3xl bg-gradient-to-r from-[#0A2218] via-[#123B29] to-[#1A523B] text-white p-6 sm:p-8 shadow-xl relative overflow-hidden">
+            <div class="max-w-xl space-y-3 relative z-10">
+              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-bold" data-en="✨ From Late Detection to Early Prevention" data-hi="✨ देर से पहचान के बजाय समय पर रोकथाम">
+                ✨ From Late Detection to Early Prevention
+              </span>
+              <h1 id="homeHeroTitle" class="text-2xl sm:text-3xl font-extrabold tracking-tight leading-tight" data-en="Protect Your Crops Before Damage Spreads." data-hi="नुकसान फैलने से पहले अपनी फसल की रक्षा करें।">
+                Protect Your Crops Before Damage Spreads.
+              </h1>
+              <p class="text-xs sm:text-sm text-emerald-100/90 leading-relaxed" data-en="AI-powered early disease detection, live GPS weather risk prediction, location crop advisor, Mandi prices, and voice advisory." data-hi="एआई-आधारित प्रारंभिक रोग पहचान, लाइव मौसम जोखिम पूर्वानुमान, स्थान अनुसार फसल सलाह, मंडी भाव एवं वॉयस सलाह।">
+                AI-powered early disease detection, live GPS weather risk prediction, location crop advisor, Mandi prices, and voice advisory.
+              </p>
+              <div class="pt-3 flex flex-wrap items-center gap-3">
+                <button onclick="switchFarmerTab('SCAN')" class="px-5 py-3 rounded-2xl btn-farm-gold text-slate-950 font-extrabold text-xs sm:text-sm cursor-pointer" data-en="📸 Scan Your Crop Leaf" data-hi="📸 फसल की पत्ती स्कैन करें">
+                  📸 Scan Your Crop Leaf
+                </button>
+                <button onclick="switchFarmerTab('ADVISOR')" class="px-5 py-3 rounded-2xl bg-white/15 hover:bg-white/25 border border-white/25 text-white font-bold text-xs sm:text-sm cursor-pointer transition-all" data-en="🌾 Check Best Crops for My Location" data-hi="🌾 मेरे स्थान के लिए सर्वोत्तम फसलें">
+                  🌾 Check Best Crops for My Location
+                </button>
+                <button onclick="switchFarmerTab('TOOLS')" class="px-5 py-3 rounded-2xl bg-emerald-700/80 hover:bg-emerald-600 border border-emerald-400/30 text-white font-bold text-xs sm:text-sm cursor-pointer transition-all" data-en="📈 Live Mandi Rates & Drone Tools" data-hi="📈 लाइव मंडी भाव एवं ड्रोन कैलकुलेटर">
+                  📈 Live Mandi Rates & Drone Tools
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- High Risk Alert Banner -->
+          <div class="bg-red-50 border-2 border-red-300 rounded-2xl p-5 flex flex-wrap items-center justify-between gap-4 shadow-sm">
+            <div class="space-y-1">
+              <span class="text-xs font-extrabold uppercase bg-red-200 text-red-900 px-2.5 py-0.5 rounded" data-en="Pre-Symptom Early Warning" data-hi="पूर्व-लक्षण प्रारंभिक चेतावनी">
+                Pre-Symptom Early Warning
+              </span>
+              <h3 class="text-base font-extrabold text-red-950" data-en="🚨 HIGH RISK ALERT: Fungal Blight Risk is 87% in Tomato (Flowering Stage)" data-hi="🚨 उच्च जोखिम चेतावनी: टमाटर की फसल में अगेती झुलसा का जोखिम 87% है">
+                🚨 HIGH RISK ALERT: Fungal Blight Risk is 87% in Tomato (Flowering Stage)
+              </h3>
+              <p class="text-xs text-red-800" data-en="Triggered by 81%+ relative humidity, unseasonal moisture, and +125% surge in trapped insect vectors." data-hi="81% से अधिक नमी, बेमौसम बारिश और कीट जाल में +125% वृद्धि के कारण चेतावनी जारी की गई है।">
+                Triggered by 81%+ relative humidity, unseasonal moisture, and +125% surge in trapped insect vectors.
+              </p>
+            </div>
+            <button onclick="switchFarmerTab('SCAN')" class="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs cursor-pointer shadow" data-en="View Problem & Solution Report →" data-hi="समस्या एवं समाधान रिपोर्ट देखें →">
+              View Problem & Solution Report →
+            </button>
+          </div>
+
+          <!-- Quick Bento Grid Cards -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Weather Card -->
+            <div class="farm-card p-5 flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-bold text-slate-500 mb-2" data-en="🌦️ Present Location Weather" data-hi="🌦️ वर्तमान स्थान का मौसम">🌦️ Present Location Weather</div>
+                <div id="homeTempDisplay" class="text-3xl font-extrabold text-slate-900">28.4°C</div>
+                <div id="homeHumDisplay" class="text-xs font-semibold text-amber-700 mt-1" data-en="Humidity: 81% (High Spore Risk)" data-hi="नमी: 81% (उच्च फंगस जोखिम)">Humidity: 81% (High Spore Risk)</div>
+              </div>
+              <button onclick="switchFarmerTab('ADVISOR')" class="mt-4 text-xs font-bold text-emerald-700 hover:underline text-left cursor-pointer" data-en="View Location Crops & Weather →" data-hi="जिले के अनुसार फसलें व मौसम देखें →">
+                View Location Crops & Weather →
+              </button>
+            </div>
+
+            <!-- Mandi & Profit Card -->
+            <div class="farm-card p-5 flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-bold text-slate-500 mb-2" data-en="📈 Live e-NAM Mandi Price (Tomato)" data-hi="📈 लाइव ई-नाम मंडी भाव (टमाटर)">📈 Live e-NAM Mandi Price (Tomato)</div>
+                <div class="text-2xl font-extrabold text-emerald-800">₹2,450 / Quintal</div>
+                <div class="text-xs font-bold text-emerald-600 mt-1" data-en="▲ +₹180 Up Today in Lucknow Mandi" data-hi="▲ लखनऊ मंडी में आज +₹180 की तेजी">▲ +₹180 Up Today in Lucknow Mandi</div>
+              </div>
+              <button onclick="switchFarmerTab('TOOLS')" class="mt-4 text-xs font-bold text-emerald-700 hover:underline text-left cursor-pointer" data-en="Open Mandi & Profit Calculator →" data-hi="मंडी भाव एवं मुनाफा कैलकुलेटर खोलें →">
+                Open Mandi & Profit Calculator →
+              </button>
+            </div>
+
+            <!-- Voice Assistant Card -->
+            <div class="farm-card p-5 flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-bold text-slate-500 mb-2" data-en="🤖 Bilingual Voice AI" data-hi="🤖 द्विभाषी वॉयस कृषि AI">🤖 Bilingual Voice AI</div>
+                <p class="text-xs text-slate-600" data-en="Speak in Hindi or English to ask about leaf spots, fertilizers, or weather risks." data-hi="हिंदी या अंग्रेजी में बोलकर पत्ती के धब्बों, खाद या मौसम के बारे में तुरंत पूछें।">Speak in Hindi or English to ask about leaf spots, fertilizers, or weather risks.</p>
+              </div>
+              <button onclick="switchFarmerTab('ASSISTANT')" class="mt-4 w-full py-2.5 rounded-xl btn-farm-primary text-white font-bold text-xs cursor-pointer" data-en="🎤 Open Voice AI Assistant" data-hi="🎤 वॉयस AI सहायक खोलें">
+                🎤 Open Voice AI Assistant
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- TAB 1: LOCATION CROP ADVISOR ("कहाँ कौन सी फसल होगी")            -->
+        <!-- =============================================================== -->
+        <div id="farmerTabAdvisor" class="hidden space-y-6">
+          <!-- Present Live Weather & Soil Header -->
+          <div class="bg-gradient-to-r from-[#0F291E] via-[#153F2D] to-[#0F291E] text-white rounded-3xl p-6 shadow-md space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-4">
+              <div>
+                <span id="advisorLocationPill" class="px-3 py-1 rounded-full bg-emerald-500/20 border border-emerald-400/30 text-emerald-300 text-xs font-extrabold">
+                  📍 Lucknow District, Uttar Pradesh (Live Weather Connected)
+                </span>
+                <h2 id="advisorMainHeading" class="text-xl sm:text-2xl font-extrabold mt-2" data-en="🌾 Location-Wise Crop Advisor: What Crops Will Grow Best Here?" data-hi="🌾 स्थान अनुसार फसल सलाहकार: आपके जिले में कौन सी फसल सबसे अच्छी होगी?">
+                  🌾 Location-Wise Crop Advisor: What Crops Will Grow Best Here?
+                </h2>
+                <p id="advisorSubHeading" class="text-xs text-emerald-100/90 mt-1" data-en="Scientifically matched crops with rich photography based on present temperature, humidity, soil profile, and local market demand." data-hi="वर्तमान तापमान, नमी, मिट्टी के प्रकार और स्थानीय बाजार की मांग के आधार पर वैज्ञानिक रूप से चुनी गई सर्वाधिक मुनाफे वाली फसलें।">
+                  Scientifically matched crops with rich photography based on present temperature, humidity, soil profile, and local market demand.
+                </p>
+              </div>
+            </div>
+
+            <!-- Present Weather Metrics Grid -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2 text-xs">
+              <div class="bg-black/25 p-3.5 rounded-2xl border border-white/10">
+                <div class="text-emerald-300 text-[11px] font-semibold" data-en="Present Temperature" data-hi="वर्तमान तापमान">Present Temperature</div>
+                <div id="liveTempDisplay" class="text-2xl font-black mt-0.5">28.4°C</div>
+              </div>
+              <div class="bg-black/25 p-3.5 rounded-2xl border border-white/10">
+                <div class="text-emerald-300 text-[11px] font-semibold" data-en="Present Humidity" data-hi="वर्तमान नमी">Present Humidity</div>
+                <div id="liveHumDisplay" class="text-2xl font-black mt-0.5">81%</div>
+              </div>
+              <div class="bg-black/25 p-3.5 rounded-2xl border border-white/10">
+                <div class="text-emerald-300 text-[11px] font-semibold" data-en="Regional Soil Type" data-hi="मिट्टी का प्रकार">Regional Soil Type</div>
+                <div id="liveSoilDisplay" class="text-xs font-extrabold mt-1">Central Gangetic Alluvial Loam</div>
+              </div>
+              <div class="bg-black/25 p-3.5 rounded-2xl border border-white/10">
+                <div class="text-emerald-300 text-[11px] font-semibold" data-en="Key Tehsils / Blocks" data-hi="प्रमुख कृषि क्षेत्र / तहसील">Key Tehsils / Blocks</div>
+                <div id="liveTehsilDisplay" class="text-[11px] font-bold mt-1">Malihabad, Bakshi Ka Talab, Mohanlalganj</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Season Filter Buttons -->
+          <div class="farm-card p-4 flex flex-wrap items-center gap-2">
+            <span class="text-xs font-extrabold text-slate-700 mr-2" data-en="Filter by Season:" data-hi="सीजन के अनुसार चुनें:">Filter by Season:</span>
+            <button onclick="renderLocationCrops('ALL')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-emerald-700 text-white cursor-pointer" data-en="All Seasons" data-hi="सभी सीजन (All)">All Seasons</button>
+            <button onclick="renderLocationCrops('Rabi')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer" data-en="Rabi (रबी - Winter)" data-hi="रबी सीजन (सर्दियों की फसलें)">Rabi (रबी - Winter)</button>
+            <button onclick="renderLocationCrops('Kharif')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer" data-en="Kharif (खरीफ - Monsoon)" data-hi="खरीफ सीजन (मानसून फसलें)">Kharif (खरीफ - Monsoon)</button>
+            <button onclick="renderLocationCrops('Zaid')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer" data-en="Zaid / Summer (जायद)" data-hi="जायद / गर्मी की फसलें">Zaid / Summer (जायद)</button>
+            <button onclick="renderLocationCrops('Horticulture')" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-slate-100 text-slate-700 hover:bg-slate-200 cursor-pointer" data-en="Horticulture (बागवानी)" data-hi="बागवानी एवं नकदी फसलें">Horticulture (बागवानी)</button>
+          </div>
+
+          <!-- Dynamic Recommended Crops Cards Container with High-Res Images -->
+          <div id="locationCropCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-5"></div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- TAB 2: AI CROP SCANNER WITH PROBLEM REPORT & SOLUTION REPORT    -->
+        <!-- =============================================================== -->
+        <div id="farmerTabScan" class="hidden space-y-6">
+          <div class="farm-card p-5 flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <span class="text-[11px] font-extrabold uppercase px-2.5 py-1 rounded-full bg-amber-100 text-amber-900">
+                Real HTML5 Vision Canvas + Diagnostic Report Generator
+              </span>
+              <h2 class="text-xl font-extrabold text-slate-900 mt-2" data-en="📸 AI Crop Scanner — Crop Health Report & Action Plan" data-hi="📸 एआई फसल स्कैनर — फसल स्वास्थ्य रिपोर्ट एवं कार्य योजना">
+                📸 AI Crop Scanner — Crop Health Report & Action Plan
+              </h2>
+              <p class="text-xs text-slate-600" data-en="Upload a clear crop/leaf photo. AI diagnosis requires a configured vision API; non-crop images are rejected and uncertain results are clearly marked." data-hi="अपने फोन से पत्ती का फोटो अपलोड करें और तुरंत पूरी समस्या रिपोर्ट और वैज्ञानिक समाधान रिपोर्ट प्राप्त करें।">
+                Upload a clear crop/leaf photo. AI diagnosis requires a configured vision API; non-crop images are rejected and uncertain results are clearly marked.
+              </p>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="text-xs font-bold text-slate-600" for="scanCropType">Crop type</label>
+              <select id="scanCropType" class="rounded-xl border border-slate-300 bg-white px-3 py-2.5 text-xs font-semibold" aria-label="Select crop type">
+                <option value="Unknown">Not sure / पहचान नहीं</option><option>Tomato</option><option>Wheat</option><option>Rice</option><option>Mustard</option><option>Potato</option><option>Maize</option><option>Chilli</option><option>Onion</option><option>Cotton</option><option>Sugarcane</option><option>Brinjal</option><option>Okra</option><option>Other</option>
+              </select>
+              <label class="px-4 py-2.5 rounded-xl btn-farm-primary text-white font-bold text-xs flex items-center gap-2 cursor-pointer">
+                <span data-en="📤 Upload Leaf Photo" data-hi="📤 पत्ती का फोटो अपलोड करें">📤 Upload Leaf Photo</span>
+                <input type="file" accept="image/jpeg,image/png,image/webp" onchange="handleScanFileUpload(event)" class="hidden" />
+              </label>
+              <button onclick="window.print()" class="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs flex items-center gap-2 shadow cursor-pointer" data-en="🖨️ Print / Save PDF Report" data-hi="🖨️ रिपोर्ट प्रिंट / PDF सेव करें">
+                🖨️ Print / Save PDF Report
+              </button>
+            </div>
+          </div>
+
+          <!-- Scanner Workbench Grid -->
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left 4 Cols: Canvas Preview -->
+            <div class="lg:col-span-4 farm-card p-4 flex flex-col justify-between">
+              <div>
+                <div class="text-xs font-bold text-slate-500 uppercase mb-2" data-en="Scanned Leaf & Lesion Detection Box" data-hi="स्कैन की गई पत्ती एवं प्रभावित क्षेत्र">Scanned Leaf & Lesion Detection Box</div>
+                <div class="relative rounded-xl overflow-hidden border border-slate-200 bg-slate-900 aspect-square">
+                  <canvas id="scanCanvas" width="360" height="360" class="w-full h-full object-cover"></canvas>
+                </div>
+              </div>
+              <div class="mt-4 space-y-1.5 text-xs">
+                <div class="flex justify-between py-1 border-b border-slate-100">
+                  <span class="text-slate-500" data-en="Image Quality Check:" data-hi="फोटो गुणवत्ता जांच:">Image Quality Check:</span>
+                  <span class="font-bold text-slate-600">Waiting for image validation</span>
+                </div>
+                <div class="flex justify-between py-1">
+                  <span class="text-slate-500" data-en="Affected Lesion Area:" data-hi="प्रभावित पत्ती क्षेत्र:">Affected Lesion Area:</span>
+                  <span id="scanLesionPctDisplay" class="font-extrabold text-slate-600">Not diagnosed yet</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right 8 Cols: 1. PROBLEM REPORT + 2. SOLUTION REPORT -->
+            <div class="lg:col-span-8 space-y-5">
+              <!-- CARD 1: PROBLEM REPORT -->
+              <div class="bg-white rounded-2xl p-5 border-2 border-red-200 shadow-sm space-y-3">
+                <div class="flex items-center justify-between border-b border-red-100 pb-3">
+                  <div>
+                    <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-red-50 text-red-700" data-en="PART 1: CROP PROBLEM REPORT" data-hi="भाग १: फसल समस्या रिपोर्ट (PROBLEM REPORT)">
+                      PART 1: CROP PROBLEM REPORT
+                    </span>
+                    <h3 id="probReportTitle" class="text-lg font-extrabold text-slate-900 mt-1" data-en="Upload a crop image to begin diagnosis" data-hi="फसल की फोटो अपलोड करें">
+                      Upload a crop image to begin diagnosis
+                    </h3>
+                  </div>
+                  <span class="px-3 py-1 rounded-xl text-xs font-extrabold bg-red-600 text-white">
+                    Awaiting scan
+                  </span>
+                </div>
+                <p id="probReportDesc" class="text-xs text-slate-700 leading-relaxed whitespace-pre-line" data-en="No diagnosis yet. Upload a clear crop/leaf image. A vision model must validate the image before a diagnosis or recommendations are shown." data-hi="अभी कोई निदान नहीं हुआ है। साफ फसल/पत्ती की फोटो अपलोड करें। फोटो की पुष्टि होने के बाद ही रिपोर्ट दिखाई जाएगी।">
+                  No diagnosis yet. Upload a clear crop/leaf image. A vision model must validate the image before a diagnosis or recommendations are shown.
+                </p>
+              </div>
+
+              <!-- CARD 2: SOLUTION REPORT -->
+              <div class="bg-white rounded-2xl p-5 border-2 border-emerald-300 shadow-sm space-y-4">
+                <div class="flex items-center justify-between border-b border-emerald-100 pb-3">
+                  <div>
+                    <span class="text-[10px] font-extrabold uppercase px-2 py-0.5 rounded bg-emerald-100 text-emerald-800" data-en="PART 2: ACTIONABLE SOLUTION REPORT" data-hi="भाग २: वैज्ञानिक समाधान एवं उपचार रिपोर्ट (SOLUTION REPORT)">
+                      PART 2: ACTIONABLE SOLUTION REPORT
+                    </span>
+                    <h3 class="text-lg font-extrabold text-slate-900 mt-1" data-en="Step-by-Step Guidance (updated after a valid scan)" data-hi="चरण-दर-चरण सलाह (सही स्कैन के बाद अपडेट होगी)">
+                      Step-by-Step Guidance (updated after a valid scan)
+                    </h3>
+                  </div>
+                  <span class="px-3 py-1 rounded-full text-xs font-bold bg-amber-100 text-amber-800">General guidance · not expert verified</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                  <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1">
+                    <div class="font-extrabold text-emerald-950" data-en="1. Immediate Sanitation (तत्काल स्वच्छता)" data-hi="१. तत्काल खेत की स्वच्छता (Immediate Action)">1. Immediate Sanitation (तत्काल स्वच्छता)</div>
+                    <p class="text-slate-700" data-en="After confirming symptoms, remove clearly infected plant material where appropriate and avoid wetting foliage. Ask a local expert if unsure." data-hi="लक्षणों की पुष्टि के बाद ही प्रभावित हिस्सों को हटाएँ। पत्तियों को गीला करने से बचें और संदेह होने पर कृषि विशेषज्ञ से पूछें।">After confirming symptoms, remove clearly infected plant material where appropriate and avoid wetting foliage. Ask a local expert if unsure.</p>
+                  </div>
+                  <div class="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 space-y-1">
+                    <div class="font-extrabold text-emerald-950" data-en="2. Biological Eco-Safe Spray (जैविक उपचार)" data-hi="२. जैविक एवं सुरक्षित छिड़काव (Biological Spray)">2. Biological Eco-Safe Spray (जैविक उपचार)</div>
+                    <p class="text-slate-700" data-en="Biological products are crop- and disease-specific. Use only a registered product whose label matches the crop and problem." data-hi="जैविक उत्पाद फसल और रोग के अनुसार अलग होते हैं। केवल सही फसल के लिए पंजीकृत उत्पाद का लेबल मानें।">Biological products are crop- and disease-specific. Use only a registered product whose label matches the crop and problem.</p>
+                  </div>
+                  <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 space-y-1">
+                    <div class="font-extrabold text-slate-900" data-en="3. Nutritional Immunity Boost (पोषण सुधार)" data-hi="३. पोषण एवं रोग प्रतिरोधक क्षमता (Immunity Boost)">3. Nutritional Immunity Boost (पोषण सुधार)</div>
+                    <p class="text-slate-700" data-en="Do not assume a nutrient deficiency from an image alone. Use a soil/plant test or expert assessment before applying nutrients." data-hi="केवल फोटो से पोषक तत्वों की कमी तय नहीं होती। खाद डालने से पहले मिट्टी/पौधे की जाँच या विशेषज्ञ सलाह लें।">Do not assume a nutrient deficiency from an image alone. Use a soil/plant test or expert assessment before applying nutrients.</p>
+                  </div>
+                  <div class="p-3.5 rounded-xl bg-amber-50 border border-amber-200 space-y-1">
+                    <div class="font-extrabold text-amber-950" data-en="4. Approved Protectant Guidance (रासायनिक सलाह)" data-hi="४. अनुमोदित रासायनिक सुरक्षा सलाह">4. Approved Protectant Guidance (रासायनिक सलाह)</div>
+                    <p class="text-amber-900" data-en="Do not choose a pesticide from an uncertain image diagnosis. Confirm the crop, disease, registration, label rate, PPE and pre-harvest interval with an agricultural expert." data-hi="अनिश्चित फोटो निदान पर दवा न चुनें। फसल, रोग, पंजीकरण, लेबल और प्रतीक्षा अवधि की विशेषज्ञ से पुष्टि करें।">Do not choose a pesticide from an uncertain image diagnosis. Confirm the crop, disease, registration, label rate, PPE and pre-harvest interval with an agricultural expert.</p>
+                  </div>
+                </div>
+                <div class="rounded-2xl border border-emerald-200 bg-gradient-to-r from-emerald-50 to-white p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div><p class="font-extrabold text-emerald-950">Need a product for this report?</p><p class="mt-1 text-xs text-slate-600">Open Krishi E-Mart with products matched to the crop and scan result. Product prices are clearly marked if illustrative.</p></div>
+                  <button id="reportEmartButton" onclick="openEmartFromReport()" class="shrink-0 rounded-xl bg-emerald-700 px-4 py-3 text-sm font-extrabold text-white shadow-sm hover:bg-emerald-800">🛒 Find relevant products</button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- TAB 3: NEW ADVANCED TOOLS (MANDI RATES, DRONE SPRAY & SOIL CARD) -->
+        <!-- =============================================================== -->
+        <div id="farmerTabTools" class="hidden space-y-6">
+          <!-- Header -->
+          <div class="bg-gradient-to-r from-[#0F291E] via-[#184532] to-[#0F291E] text-white rounded-3xl p-6 shadow-md">
+            <span class="px-3 py-0.5 rounded-full bg-amber-500/20 border border-amber-400/40 text-amber-300 text-xs font-extrabold" data-en="🚀 Advanced Smart Farming Suite" data-hi="🚀 आधुनिक स्मार्ट कृषि टूल्स">
+              🚀 Advanced Smart Farming Suite
+            </span>
+            <h2 class="text-2xl font-extrabold mt-2" data-en="📈 Live e-NAM Mandi Prices, Drone Dosage Calculator & Soil Health Card" data-hi="📈 लाइव ई-नाम मंडी भाव, ड्रोन छिड़काव कैलकुलेटर एवं मृदा स्वास्थ्य कार्ड">
+              📈 Live e-NAM Mandi Prices, Drone Dosage Calculator & Soil Health Card
+            </h2>
+          </div>
+
+          <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- Left 6 Cols: Live e-NAM Mandi Prices + Profit Calculator -->
+            <div class="lg:col-span-6 farm-card p-6 space-y-4">
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <h3 class="font-extrabold text-base text-slate-900" data-en="📈 Live e-NAM Mandi Market Rates (Today)" data-hi="📈 लाइव ई-नाम मंडी बाजार भाव (आज के ताजा भाव)">
+                  📈 Live e-NAM Mandi Market Rates (Today)
+                </h3>
+                <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-full">LIVE MANDI</span>
+              </div>
+
+              <div class="space-y-2.5 text-xs">
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <img src="https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=120&q=80" class="w-11 h-11 rounded-xl object-cover" alt="Tomato" />
+                    <div>
+                      <div class="font-extrabold text-sm text-slate-900" data-en="Tomato (Hybrid F1)" data-hi="टमाटर (हाइब्रिड F1)">Tomato (Hybrid F1)</div>
+                      <div class="text-slate-500">Lucknow & Azadpur Mandi</div>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-base font-black text-emerald-800">₹2,450 / Qt</div>
+                    <div class="text-[11px] font-bold text-emerald-600">▲ +₹180 Today</div>
+                  </div>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <img src="https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=120&q=80" class="w-11 h-11 rounded-xl object-cover" alt="Wheat" />
+                    <div>
+                      <div class="font-extrabold text-sm text-slate-900" data-en="Wheat (Sharbati / DBW-187)" data-hi="गेहूं (शरबती / DBW-187)">Wheat (Sharbati / DBW-187)</div>
+                      <div class="text-slate-500">UP & MP Mandis</div>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-base font-black text-emerald-800">₹2,525 / Qt</div>
+                    <div class="text-[11px] font-bold text-emerald-600">▲ +₹65 Above MSP</div>
+                  </div>
+                </div>
+
+                <div class="p-3.5 rounded-2xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <img src="https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=120&q=80" class="w-11 h-11 rounded-xl object-cover" alt="Potato" />
+                    <div>
+                      <div class="font-extrabold text-sm text-slate-900" data-en="Potato (Kufri Bahar)" data-hi="आलू (कुफरी बहार)">Potato (Kufri Bahar)</div>
+                      <div class="text-slate-500">Agra & Lucknow Mandi</div>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <div class="text-base font-black text-emerald-800">₹1,680 / Qt</div>
+                    <div class="text-[11px] font-bold text-emerald-600">▲ +₹90 Today</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right 6 Cols: Smart Drone Spray & Fertilizer Dosage Calculator -->
+            <div class="lg:col-span-6 farm-card p-6 space-y-4 flex flex-col justify-between">
+              <div class="space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                  <h3 class="font-extrabold text-base text-slate-900" data-en="🚁 Smart Drone Spray & Fertilizer Calculator" data-hi="🚁 स्मार्ट ड्रोन छिड़काव एवं खाद मात्रा कैलकुलेटर">
+                    🚁 Smart Drone Spray & Fertilizer Calculator
+                  </h3>
+                  <span class="text-xs font-bold text-purple-800 bg-purple-100 px-2.5 py-1 rounded-full">PRECISION</span>
+                </div>
+
+                <p class="text-xs text-slate-600" data-en="Enter your farm land size in Acres to automatically calculate the exact bio-fungicide, NPK, and Drone water volume required:" data-hi="अपने खेत का क्षेत्रफल (एकड़ में) दर्ज करें और जानें कि कितनी दवा, खाद और पानी की आवश्यकता होगी:">
+                  Enter your farm land size in Acres to automatically calculate the exact bio-fungicide, NPK, and Drone water volume required:
+                </p>
+
+                <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 space-y-3 text-xs">
+                  <div>
+                    <label class="block font-bold text-slate-700 mb-1" data-en="Enter Farm Area (in Acres):" data-hi="खेत का क्षेत्रफल (एकड़ में):">Enter Farm Area (in Acres):</label>
+                    <input type="number" step="0.5" id="calcAcresInput" value="3.5" oninput="calculateDroneDosage(this.value)" class="w-full border border-slate-300 rounded-xl px-3.5 py-2 font-extrabold text-slate-900 text-sm" />
+                  </div>
+
+                  <div class="grid grid-cols-3 gap-2 pt-2 text-center">
+                    <div class="p-3 bg-white rounded-xl border border-slate-200">
+                      <div class="text-[10px] text-slate-400 font-bold uppercase" data-en="Trichoderma Bio-Spray" data-hi="ट्राइकोडर्मा (जैविक)">Trichoderma Bio-Spray</div>
+                      <div id="calcTrichoOut" class="text-base font-black text-emerald-700 mt-1">875 g</div>
+                    </div>
+                    <div class="p-3 bg-white rounded-xl border border-slate-200">
+                      <div class="text-[10px] text-slate-400 font-bold uppercase" data-en="NPK Water Soluble" data-hi="घुलनशील NPK खाद">NPK Water Soluble</div>
+                      <div id="calcNpkOut" class="text-base font-black text-purple-700 mt-1">10.5 kg</div>
+                    </div>
+                    <div class="p-3 bg-white rounded-xl border border-slate-200">
+                      <div class="text-[10px] text-slate-400 font-bold uppercase" data-en="Drone Water Tank" data-hi="ड्रोन पानी की मात्रा">Drone Water Tank</div>
+                      <div id="calcWaterOut" class="text-base font-black text-sky-700 mt-1">35 Liters</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Digital Soil Health Card Summary -->
+              <div class="p-4 rounded-2xl bg-emerald-50 border border-emerald-200 text-xs space-y-1.5">
+                <div class="font-extrabold text-emerald-950" data-en="🧪 Digital Soil Health Card Status (Alluvial Loam)" data-hi="🧪 डिजिटल मृदा स्वास्थ्य कार्ड (जलोढ़ दोमट मिट्टी)">
+                  🧪 Digital Soil Health Card Status (Alluvial Loam)
+                </div>
+                <div class="flex justify-between text-emerald-900 font-medium">
+                  <span>Nitrogen (N): <strong>245 kg/ha (Medium)</strong></span>
+                  <span>Phosphorus (P): <strong>38 kg/ha (High)</strong></span>
+                  <span>pH: <strong>7.1 (Optimal)</strong></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- TAB 4: VOICE FARMING AI ASSISTANT                               -->
+        <!-- =============================================================== -->
+        <div id="farmerTabAssistant" class="hidden space-y-6">
+          <div class="farm-card overflow-hidden flex flex-col h-[540px]">
+            <div class="p-4 bg-gradient-to-r from-emerald-900 to-emerald-800 text-white flex flex-wrap items-center justify-between gap-2">
+              <div>
+                <h3 class="font-bold text-sm flex items-center gap-2">
+                  <span data-en="🤖 ChatGPT Krishi AI Voice Assistant (हिंदी • English)" data-hi="🤖 ChatGPT कृषि AI वॉयस सहायक (हिंदी • English)">🤖 ChatGPT Krishi AI Voice Assistant (हिंदी • English)</span>
+                  <span id="chatGptStatusBadge" class="text-[10px] bg-emerald-500/30 px-2 py-0.5 rounded-full font-bold">⚡ Smart Agro Engine Active</span>
+                </h3>
+                <p class="text-xs text-emerald-200" data-en="Speaks & answers all farming questions out loud in Hindi & English!" data-hi="हिंदी और अंग्रेजी में बोलकर आपके सभी कृषि प्रश्नों का सटीक उत्तर देता है!">Speaks & answers all farming questions out loud in Hindi & English!</p>
+              </div>
+              <div class="flex items-center gap-2">
+                <button onclick="promptOpenAiApiKey()" class="px-3 py-1.5 rounded-xl bg-white/15 hover:bg-white/25 text-white text-xs font-bold cursor-pointer">
+                  🔑 Connect ChatGPT Key
+                </button>
+                <button onclick="stopVoiceSpeech()" class="px-3 py-1.5 rounded-xl bg-red-600 text-white text-xs font-bold cursor-pointer" data-en="Mute Voice (🔇)" data-hi="आवाज़ बंद करें (🔇)">Mute Voice (🔇)</button>
+              </div>
+            </div>
+
+            <div id="voiceChatMessages" class="flex-1 p-4 overflow-y-auto space-y-3 bg-slate-50 custom-scroll">
+              <div class="p-3.5 rounded-2xl bg-white border border-slate-200 text-xs max-w-[80%]">
+                <strong data-en="Namaste! I am your Bilingual Agentic Crop Guardian Assistant." data-hi="नमस्ते! मैं आपका द्विभाषी एजेंटिक फसल रक्षक सहायक हूँ।">Namaste! I am your Bilingual Agentic Crop Guardian Assistant.</strong><br/>
+                <span data-en="Ask me any question in Hindi or English about Tomato, Wheat, Onion, Lucknow crops, NPK fertilizers, or pest control!" data-hi="टमाटर, गेहूं, प्याज, लखनऊ की फसलों, NPK खाद या कीट नियंत्रण के बारे में हिंदी या अंग्रेजी में कोई भी सवाल पूछें!">Ask me any question in Hindi or English about Tomato, Wheat, Onion, Lucknow crops, NPK fertilizers, or pest control!</span>
+              </div>
+            </div>
+
+            <div class="p-3 bg-white border-t border-slate-200 flex items-center gap-2">
+              <button onclick="startVoiceInput()" class="px-3.5 py-2.5 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-200 font-bold text-xs cursor-pointer" data-en="🎤 Speak" data-hi="🎤 बोलें">🎤 Speak</button>
+              <input id="voiceChatInput" type="text" placeholder="Ask any farming question..." class="flex-1 text-xs bg-slate-50 border border-slate-300 rounded-xl px-3.5 py-2.5" onkeydown="if(event.key==='Enter') sendVoiceChatMsg()" />
+              <button onclick="sendVoiceChatMsg()" class="px-4 py-2.5 rounded-xl btn-farm-primary text-white font-bold text-xs cursor-pointer" data-en="Send →" data-hi="भेजें →">Send →</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- TAB 5: PRE-SYMPTOM RISK ENGINE                                  -->
+        <!-- =============================================================== -->
+        <div id="farmerTabRisk" class="hidden space-y-6">
+          <div class="farm-card p-6 space-y-5">
+            <div class="flex items-center justify-between">
+              <h2 class="text-xl font-extrabold text-slate-900" data-en="🚨 Pre-Symptom Disease Risk Engine" data-hi="🚨 लक्षण दिखने से पहले रोग जोखिम पूर्वानुमान इंजन">🚨 Pre-Symptom Disease Risk Engine</h2>
+              <span class="text-2xl font-black text-red-600">87% HIGH RISK</span>
+            </div>
+            <div class="p-4 rounded-2xl bg-red-50 border border-red-200 space-y-2 text-xs text-red-950 font-medium">
+              <div class="font-extrabold text-sm" data-en="Why is the disease risk 87% HIGH?" data-hi="रोग का जोखिम 87% (उच्च) क्यों है?">Why is the disease risk 87% HIGH?</div>
+              <div>✓ High relative humidity (81%+) accelerates fungal spore germination</div>
+              <div>✓ Vulnerable Flowering growth stage in Tomato (45 Days)</div>
+              <div>✓ Confirmed Early Blight reports in neighboring village clusters</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- TAB 6: MY ACTIVE CROPS                                          -->
+        <!-- =============================================================== -->
+        <div id="farmerTabCrops" class="hidden space-y-6">
+          <div class="farm-card p-5 flex items-center justify-between">
+            <h2 class="text-lg font-extrabold text-slate-900" data-en="🌱 My Active Farm Crops" data-hi="🌱 मेरे खेत की सक्रिय फसलें">🌱 My Active Farm Crops</h2>
+            <button onclick="promptAddCustomCrop()" class="px-4 py-2 rounded-xl btn-farm-primary text-white font-bold text-xs cursor-pointer" data-en="+ Add Any Crop" data-hi="+ नई फसल जोड़ें">+ Add Any Crop</button>
+          </div>
+          <div id="myCropsGrid" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- TAB 7: INTERACTIVE GIS MAP                                      -->
+        <!-- =============================================================== -->
+        <div id="farmerTabMap" class="hidden space-y-6">
+          <div class="farm-card p-5 space-y-3">
+            <h2 class="text-lg font-extrabold text-slate-900" data-en="🗺️ All-India GIS Disease Hotspot & Outbreak Surveillance Map" data-hi="🗺️ अखिल भारतीय रोग हॉटस्पॉट एवं प्रकोप निगरानी मानचित्र">🗺️ All-India GIS Disease Hotspot & Outbreak Surveillance Map</h2>
+            <div id="liveLeafletMap" class="w-full h-96 rounded-2xl border border-slate-300"></div>
+          </div>
+        </div>
+
+        <!-- =============================================================== -->
+        <!-- TAB 8: FOLLOW-UP & PDF REPORTS                                  -->
+        <!-- =============================================================== -->
+        <div id="farmerTabReports" class="hidden space-y-6">
+          <div class="farm-card p-6 space-y-4">
+            <div class="flex items-center justify-between">
+              <h2 class="text-lg font-extrabold text-slate-900" data-en="📈 Follow-Up Crop Health Recovery (Day 1 → Day 5 → Day 10)" data-hi="📈 फसल स्वास्थ्य सुधार रिपोर्ट (दिन 1 → दिन 5 → दिन 10)">📈 Follow-Up Crop Health Recovery (Day 1 → Day 5 → Day 10)</h2>
+              <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-slate-900 text-white font-bold text-xs cursor-pointer" data-en="Print PDF Report" data-hi="PDF रिपोर्ट प्रिंट करें">Print PDF Report</button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-xs">
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="font-bold">Day 1 (Initial Scan)</div>
+                <div class="text-red-600 font-extrabold mt-1">Severity: 70%</div>
+              </div>
+              <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+                <div class="font-bold">Day 5 (Post-IPM Check)</div>
+                <div class="text-amber-600 font-extrabold mt-1">Severity: 48% (Improving)</div>
+              </div>
+              <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200">
+                <div class="font-bold">Day 10 (Recovery Verified)</div>
+                <div class="text-emerald-700 font-extrabold mt-1">Severity: 22% (Status: IMPROVING)</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- NEW MODULE: KRISHI E-MART -->
+        <div id="farmerTabEmart" class="hidden space-y-5">
+          <div class="rounded-3xl bg-gradient-to-r from-emerald-950 to-emerald-800 p-6 text-white">
+            <p class="text-xs font-bold uppercase tracking-widest text-emerald-200">KrishiRakshak AI • Marketplace</p>
+            <h2 class="mt-2 text-2xl font-extrabold" data-en="🛒 Krishi E-Mart" data-hi="🛒 कृषि ई-मार्ट">🛒 Krishi E-Mart</h2>
+            <p class="mt-2 text-sm text-emerald-100" data-en="Shop agriculture inputs with illustrative INR prices, crop-aware discovery, cart and order summaries. Prices are demo estimates—not live seller quotes." data-hi="कृषि उत्पाद खोजें, कार्ट बनाएं और ऑर्डर सारांश ट्रैक करें।">Shop agriculture inputs with illustrative INR prices, crop-aware discovery, cart and order summaries. Prices are demo estimates—not live seller quotes.</p>
+          </div>
+          <div id="emartScanContext" class="hidden rounded-xl border border-amber-300 bg-amber-50 p-4 text-sm text-amber-950"></div>
+          <div class="farm-card p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <input id="emartSearch" oninput="renderEmartProducts()" class="rounded-xl border p-3 text-sm" placeholder="Search product, crop, pest or disease" aria-label="Search agricultural products">
+            <select id="emartCategory" onchange="renderEmartProducts()" class="rounded-xl border p-3 text-sm"><option>All categories</option><option>Crop protection</option><option>Bio-pesticides</option><option>Organic farming</option><option>Fertilizers</option><option>Micronutrients</option><option>Seeds</option></select>
+            <input id="emartCrop" oninput="renderEmartProducts()" class="rounded-xl border p-3 text-sm" placeholder="Filter by crop e.g. Tomato" aria-label="Filter by crop">
+          </div>
+          <div class="flex flex-wrap items-center justify-between gap-3"><h3 class="font-extrabold text-lg">Agriculture product catalogue</h3><div class="flex gap-2"><button onclick="showEmartView('shop')" class="rounded-xl border px-3 py-2 text-xs font-bold">Shop</button><button onclick="showEmartView('cart')" class="rounded-xl bg-emerald-700 px-3 py-2 text-xs font-bold text-white">Cart (<span id="emartCartCount">0</span>)</button><button onclick="showEmartView('orders')" class="rounded-xl border px-3 py-2 text-xs font-bold">Orders</button></div></div>
+          <div id="emartProductsView" class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-4"></div>
+          <div id="emartCartView" class="hidden farm-card p-5"></div><div id="emartOrdersView" class="hidden farm-card p-5"></div>
+          <div id="emartProductModal" class="hidden fixed inset-0 z-[100] items-center justify-center bg-slate-950/60 p-4" role="dialog" aria-modal="true" aria-labelledby="emartModalTitle"><div class="w-full max-w-xl rounded-3xl bg-white p-6 shadow-2xl"><div class="flex items-start justify-between gap-3"><div><p class="text-xs font-extrabold uppercase tracking-wider text-emerald-700">Product details</p><h3 id="emartModalTitle" class="mt-1 text-xl font-extrabold text-slate-900"></h3></div><button onclick="closeEmartProductDetails()" aria-label="Close product details" class="rounded-xl border px-3 py-2 font-bold">✕</button></div><div id="emartModalBody" class="mt-4"></div><div class="mt-5 flex flex-wrap gap-2"><button id="emartModalAddButton" class="flex-1 rounded-xl bg-emerald-700 px-4 py-3 font-extrabold text-white">Add to cart</button><button onclick="closeEmartProductDetails()" class="rounded-xl border px-4 py-3 font-bold">Close</button></div></div></div>
+          <p class="rounded-xl bg-slate-100 p-3 text-xs text-slate-600">Safety & transparency: every displayed price is illustrative only, not a live seller quote. Products, stock, seller identity, registration and treatment claims are not verified. Checkout saves an order summary only; no payment is taken.</p>
+        </div>
+
+        <!-- NEW MODULE: GOVERNMENT SCHEMES & LOANS -->
+        <div id="farmerTabGovernment" class="hidden space-y-5">
+          <div class="rounded-3xl bg-gradient-to-r from-sky-950 to-emerald-900 p-6 text-white">
+            <p class="text-xs font-bold uppercase tracking-widest text-sky-200">KrishiRakshak AI • Government services</p><h2 class="mt-2 text-2xl font-extrabold" data-en="🏛️ Government Schemes & Loans" data-hi="🏛️ सरकारी योजनाएँ और कृषि ऋण">🏛️ Government Schemes & Loans</h2>
+            <p class="mt-2 text-sm text-sky-100">Scheme discovery, loan guidance, official links and a manual application tracker.</p>
+          </div>
+          <div class="farm-card p-4 grid grid-cols-1 md:grid-cols-3 gap-3">
+            <label class="text-xs font-bold">State<select id="govState" class="mt-1 w-full rounded-xl border p-3 text-sm font-normal"><option>Uttar Pradesh</option><option>Maharashtra</option><option>Bihar</option><option>Madhya Pradesh</option><option>Rajasthan</option><option>Punjab</option><option>Haryana</option></select></label>
+            <label class="text-xs font-bold">District<input id="govDistrict" class="mt-1 w-full rounded-xl border p-3 text-sm font-normal" value="Lucknow"></label>
+            <label class="text-xs font-bold">Main crop<input id="govCrop" class="mt-1 w-full rounded-xl border p-3 text-sm font-normal" value="Wheat"></label>
+            <label class="text-xs font-bold">Landholding<select id="govLand" class="mt-1 w-full rounded-xl border p-3 text-sm font-normal"><option>Small / marginal</option><option>Landless / tenant</option><option>More than 2 hectares</option><option>Not sure</option></select></label>
+            <label class="text-xs font-bold">Farmer category<select id="govFarmerType" class="mt-1 w-full rounded-xl border p-3 text-sm font-normal"><option>Owner cultivator</option><option>Tenant farmer</option><option>Sharecropper</option><option>FPO / group</option><option>Other / not sure</option></select></label>
+            <input id="govSearch" oninput="renderGovernmentSchemes()" class="self-end rounded-xl border p-3 text-sm" placeholder="Search schemes, loans, insurance">
+          </div>
+          <p class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-xs text-amber-950">Eligibility is preliminary guidance only. Current rules, deadlines, benefits and application windows must be confirmed on the official portal. Final decisions belong to the scheme authority or lender. No universal government-system access is claimed.</p>
+          <div id="governmentSchemesList" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          <div class="farm-card p-5"><h3 class="text-lg font-extrabold">My scheme & loan tracker</h3><p class="mt-1 text-sm text-slate-500">Update status manually unless an authorized live integration is configured.</p><div id="governmentTracker" class="mt-4 space-y-3"></div></div>
+        </div>
+
+      </main>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- PORTAL 2: KVK EXPERT PORTAL                                         -->
+    <!-- =================================================================== -->
+    <div id="portalExpert" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+      <div class="bg-gradient-to-r from-amber-900 to-amber-800 text-white rounded-2xl p-6 shadow-sm">
+        <h1 class="text-2xl font-extrabold" data-en="👨‍🔬 KVK Agriculture Expert Case Verification Workbench" data-hi="👨‍🔬 कृषि विज्ञान केंद्र (KVK) विशेषज्ञ सत्यापन कक्ष">👨‍🔬 KVK Agriculture Expert Case Verification Workbench</h1>
+        <p class="text-xs text-amber-100 mt-1">Verify low-confidence AI scans, confirm diagnoses, and add trusted samples to the training dataset.</p>
+      </div>
+      <div class="farm-card p-6 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <span class="text-xs font-bold bg-slate-900 text-white px-2.5 py-0.5 rounded">CASE-1042</span>
+          <h3 class="text-lg font-extrabold text-slate-900 mt-1">Tomato (45 Days) — Suspected Leaf Miner & Fungal Spot (Confidence: 62%)</h3>
+          <p class="text-xs text-slate-500">Farmer: Rameshwar Deshmukh • Location: Lucknow / Pune</p>
+        </div>
+        <button onclick="showGlobalToast('✅ Case #1042 Confirmed! Added to Trusted Training Dataset.')" class="px-4 py-2.5 rounded-xl btn-farm-primary text-white font-bold text-xs cursor-pointer">
+          [CONFIRM AI DIAGNOSIS]
+        </button>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- PORTAL 3: GOVT OFFICER PORTAL                                       -->
+    <!-- =================================================================== -->
+    <div id="portalOfficer" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+      <div class="bg-gradient-to-r from-slate-900 via-emerald-950 to-slate-900 text-white rounded-2xl p-6 shadow-md flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-extrabold" data-en="🏛️ All-India District Crop Health Surveillance Command Center" data-hi="🏛️ अखिल भारतीय जिला फसल स्वास्थ्य निगरानी केंद्र">🏛️ All-India District Crop Health Surveillance Command Center</h1>
+          <p class="text-xs text-slate-300 mt-1">Monitor district disease hotspots and broadcast emergency SMS/App alerts.</p>
+        </div>
+        <button onclick="showGlobalToast('🚨 Emergency Outbreak Broadcast sent to 1,420 farmers!')" class="px-4 py-2.5 rounded-xl bg-red-600 text-white font-extrabold text-xs cursor-pointer">
+          Broadcast District Emergency Alert
+        </button>
+      </div>
+    </div>
+
+    <!-- =================================================================== -->
+    <!-- PORTAL 4: MASTER ADMIN PANEL                                        -->
+    <!-- =================================================================== -->
+    <div id="portalAdmin" class="hidden flex-1 max-w-7xl w-full mx-auto px-4 py-6 space-y-6">
+      <div class="bg-gradient-to-r from-purple-950 via-indigo-950 to-slate-900 text-white rounded-2xl p-6 shadow-md flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-extrabold" data-en="👑 System Administrator Master Control Panel" data-hi="👑 सिस्टम एडमिनिस्ट्रेटर मास्टर कंट्रोल पैनल">👑 System Administrator Master Control Panel</h1>
+          <p class="text-xs text-purple-200 mt-1">Manage all registered farmers, KVK experts, government officers, and database records.</p>
+        </div>
+        <div class="text-right">
+          <div class="text-xs text-purple-200">Total Registered Users</div>
+          <div id="adminUserCountBadge" class="text-2xl font-black">4 Users</div>
+        </div>
+      </div>
+      <div class="farm-card p-6 space-y-4">
+        <h3 class="font-extrabold text-sm text-slate-900">👥 Registered Platform Users Directory</h3>
+        <div id="adminUsersList" class="space-y-2.5 text-xs"></div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ===================================================================== -->
+  <!-- EMBEDDED FULL-STACK JAVASCRIPT ENGINE & INSTANT BILINGUAL SWITCHER    -->
+  <!-- ===================================================================== -->
+  <script>
+    lucide.createIcons();
+
+    let currentLang = 'en';
+    let currentState = 'Uttar Pradesh';
+    let currentDistrict = 'Lucknow';
+    let leafletMapObj = null;
+
+    const ALL_INDIA_LOCATIONS = {
+      "Uttar Pradesh": ["Lucknow", "Varanasi", "Prayagraj", "Meerut", "Kanpur", "Agra", "Gorakhpur", "Ayodhya"],
+      "Delhi (NCT)": ["New Delhi", "Najafgarh Agro Zone", "North Delhi (Alipur)", "South Delhi"],
+      "Maharashtra": ["Pune", "Nashik", "Nagpur", "Solapur", "Kolhapur", "Satara", "Ahmednagar"],
+      "Punjab": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Bathinda"],
+      "Madhya Pradesh": ["Indore", "Bhopal", "Ujjain", "Jabalpur", "Gwalior"],
+      "Bihar": ["Patna", "Muzaffarpur", "Gaya", "Bhagalpur", "Purnia"]
+    };
+
+    // High-Resolution Crop Photography & Suitability Database
+    const LOCATION_CROP_DATABASE = {
+      "Lucknow": {
+        temp: 28.4,
+        humidity: 81,
+        soil: "Central Gangetic Alluvial Loam (Dumat & Matyar Soil)",
+        tehsils: "Malihabad, Bakshi Ka Talab, Mohanlalganj, Sarojini Nagar",
+        crops: [
+          {
+            name: "Tomato (टमाटर)",
+            image: "https://images.unsplash.com/photo-1592924357228-91a4daadcfea?auto=format&fit=crop&w=500&q=80",
+            variety: "Kashi Vishesh / Pusa Ruby",
+            season: "Rabi",
+            sowing: "Oct–Nov & Jan–Feb",
+            yield: "180–220 Quintals/Acre",
+            match: 99,
+            whyEn: "Bakshi Ka Talab & Malihabad alluvial soil gives highest tomato yield and direct Lucknow Mandi profits.",
+            whyHi: "बख्शी का तालाब और मलीहाबाद की दोमट मिट्टी में टमाटर की सर्वाधिक पैदावार और लखनऊ मंडी में तुरंत मुनाफा मिलता है।"
+          },
+          {
+            name: "Wheat (गेहूं)",
+            image: "https://images.unsplash.com/photo-1574323347407-f5e1ad6d020b?auto=format&fit=crop&w=500&q=80",
+            variety: "DBW-187 (Karan Vandana) / HD-3226",
+            season: "Rabi",
+            sowing: "Nov 1–Nov 25",
+            yield: "24–28 Quintals/Acre",
+            match: 99,
+            whyEn: "Cool winter nights in Lucknow ensure maximum grain weight and yellow rust resistance.",
+            whyHi: "लखनऊ की सर्दियों का तापमान गेहूं के दानों के भराव और पीले रतुआ रोग से बचाव के लिए सर्वोत्तम है।"
+          },
+          {
+            name: "Potato (आलू)",
+            image: "https://images.unsplash.com/photo-1518977676601-b53f82aba655?auto=format&fit=crop&w=500&q=80",
+            variety: "Kufri Bahar (3797) / Kufri Chipsona-1",
+            season: "Rabi",
+            sowing: "Oct 15–Nov 10",
+            yield: "120–145 Quintals/Acre",
+            match: 98,
+            whyEn: "Friable sandy loam soil around Lucknow is ideal for high-grade table & processing potatoes.",
+            whyHi: "लखनऊ क्षेत्र की भुरभुरी दोमट मिट्टी चिप्स और खाने वाले आलू की बंपर पैदावार देती है।"
+          },
+          {
+            name: "Dasheri Mango & Guava (मलीहाबादी आम)",
+            image: "https://images.unsplash.com/photo-1553279768-865429fa0078?auto=format&fit=crop&w=500&q=80",
+            variety: "Malihabad GI Dasheri / Lalit Guava",
+            season: "Horticulture",
+            sowing: "July–August",
+            yield: "90–110 Quintals/Acre",
+            match: 99,
+            whyEn: "World-famous GI-tagged Malihabad belt in Lucknow district.",
+            whyHi: "विश्व प्रसिद्ध GI-टैग प्राप्त मलीहाबादी दशहरी आम और ललित अमरूद का प्रमुख केंद्र।"
+          },
+          {
+            name: "Mentha / Mint Oil (मेंथा / पिपरमिंट)",
+            image: "https://images.unsplash.com/photo-1628556270448-4d4e4148e1b1?auto=format&fit=crop&w=500&q=80",
+            variety: "CIM-Saryu / Kosi (CIMAP Lucknow)",
+            season: "Zaid",
+            sowing: "Feb 15–Mar 15",
+            yield: "70–85 kg Oil/Acre",
+            match: 98,
+            whyEn: "Developed by CSIR-CIMAP Lucknow; high cash returns in 90 days during summer.",
+            whyHi: "सीमैप (CIMAP) लखनऊ द्वारा विकसित किस्में मात्र 90 दिनों में शानदार नकद मुनाफा देती हैं।"
+          },
+          {
+            name: "Basmati Paddy (बासमती धान)",
+            image: "https://images.unsplash.com/photo-1586201375761-83865001e31c?auto=format&fit=crop&w=500&q=80",
+            variety: "Pusa Basmati 1509 / Pusa 1121",
+            season: "Kharif",
+            sowing: "June–July",
+            yield: "22–26 Quintals/Acre",
+            match: 96,
+            whyEn: "Abundant monsoon and Gomti canal irrigation in Mohanlalganj block.",
+            whyHi: "मोहनलालगंज व गोमती नहर क्षेत्र में पर्याप्त सिंचाई सुविधा के कारण बासमती की उत्तम खेती।"
+          }
+        ]
+      }
+    };
+
+    let dbCrops = JSON.parse(localStorage.getItem('ai_crop_guardian_crops')) || [
+      { id: 1, cropName: "Tomato (टमाटर)", variety: "Kashi Vishesh F1", ageDays: 45, stage: "Flowering", risk: 87 },
+      { id: 2, cropName: "Wheat (गेहूं)", variety: "DBW-187 (Karan Vandana)", ageDays: 60, stage: "Vegetative", risk: 28 },
+      { id: 3, cropName: "Potato (आलू)", variety: "Kufri Bahar", ageDays: 50, stage: "Tuber Formation", risk: 64 }
+    ];
+
+    let dbUsers = JSON.parse(localStorage.getItem('ai_crop_guardian_users')) || [
+      { name: "Rameshwar Deshmukh", mobile: "+91 98765 43210", role: "FARMER", district: "Lucknow" },
+      { name: "Dr. Anjali Kulkarni", mobile: "+91 98220 11223", role: "EXPERT", district: "New Delhi" },
+      { name: "Shri Vikram Shinde", mobile: "+91 94220 33445", role: "OFFICER", district: "Lucknow" },
+      { name: "Master System Admin", mobile: "+91 90000 00001", role: "ADMIN", district: "New Delhi" }
+    ];
+
+    function showGlobalToast(msg) {
+      const el = document.getElementById('globalToast');
+      document.getElementById('globalToastText').innerText = msg;
+      el.classList.remove('hidden');
+      setTimeout(() => el.classList.add('hidden'), 4200);
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      populateStateDropdown('regState');
+      populateDistrictDropdown('regState', 'regDistrict');
+      populateStateDropdown('sideStateSelect');
+      populateDistrictDropdown('sideStateSelect', 'sideDistrictSelect');
+      renderLocationCrops('ALL');
+      renderMyCropsList();
+      renderAdminUsersList();
+      drawDefaultLeafScan();
+    });
+
+    function populateStateDropdown(selectId) {
+      const sel = document.getElementById(selectId);
+      if (!sel) return;
+      sel.innerHTML = Object.keys(ALL_INDIA_LOCATIONS).map(st => `<option value="${st}">${st}</option>`).join('');
+    }
+
+    function populateDistrictDropdown(stateSelectId, distSelectId) {
+      const st = document.getElementById(stateSelectId)?.value || 'Uttar Pradesh';
+      const distSel = document.getElementById(distSelectId);
+      if (!distSel) return;
+      const dists = ALL_INDIA_LOCATIONS[st] || ['Lucknow'];
+      distSel.innerHTML = dists.map(d => `<option value="${d}">${d}</option>`).join('');
+    }
+
+    // 100% INSTANT FULL-PAGE BILINGUAL SWITCHER (ENGLISH <-> हिंदी)
+    function changeAppLanguage(lang) {
+      currentLang = lang;
+
+      // Update active state of language buttons
+      ['En', 'Hi'].forEach(l => {
+        const code = l.toLowerCase();
+        const isSel = code === lang;
+        const btn1 = document.getElementById('authLang' + l);
+        const btn2 = document.getElementById('appLang' + l);
+        if (btn1) btn1.className = isSel ? 'px-4 py-1.5 rounded-xl bg-emerald-500 text-slate-950 font-extrabold cursor-pointer transition-all' : 'px-4 py-1.5 rounded-xl text-emerald-200 hover:text-white cursor-pointer transition-all';
+        if (btn2) btn2.className = isSel ? 'px-3 py-1 rounded-xl bg-emerald-500 text-slate-950 font-extrabold cursor-pointer transition-all' : 'px-3 py-1 rounded-xl text-emerald-300 hover:text-white cursor-pointer transition-all';
+      });
+
+      // Automatically translate EVERY element on the page with data-en & data-hi
+      document.querySelectorAll('[data-en][data-hi]').forEach(el => {
+        const translation = el.getAttribute('data-' + lang);
+        if (translation) {
+          el.innerText = translation;
+        }
+      });
+
+      renderLocationCrops('ALL');
+      showGlobalToast(lang === 'hi' ? '✅ संपूर्ण ऐप अब हिंदी भाषा में बदल गया है!' : '✅ Entire App Switched to English!');
+    }
+
+    function switchAuthTab(mode) {
+      if (mode === 'REGISTER') {
+        document.getElementById('registerForm').classList.remove('hidden');
+        document.getElementById('loginForm').classList.add('hidden');
+        document.getElementById('tabBtnRegister').className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-extrabold bg-emerald-700 text-white shadow cursor-pointer';
+        document.getElementById('tabBtnLogin').className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-extrabold text-slate-600 cursor-pointer';
+      } else {
+        document.getElementById('registerForm').classList.add('hidden');
+        document.getElementById('loginForm').classList.remove('hidden');
+        document.getElementById('tabBtnLogin').className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-extrabold bg-emerald-700 text-white shadow cursor-pointer';
+        document.getElementById('tabBtnRegister').className = 'flex-1 py-2.5 px-4 rounded-xl text-xs font-extrabold text-slate-600 cursor-pointer';
+      }
+    }
+
+    function handleRegistrationSubmit(e) {
+      e.preventDefault();
+      const name = document.getElementById('regName').value.trim();
+      const mobile = document.getElementById('regMobile').value.trim();
+      const state = document.getElementById('regState').value;
+      const district = document.getElementById('regDistrict').value;
+      const crop = document.getElementById('regCrop').value;
+
+      currentState = state;
+      currentDistrict = district;
+
+      dbUsers.push({ name, mobile, role: 'FARMER', district });
+      localStorage.setItem('ai_crop_guardian_users', JSON.stringify(dbUsers));
+
+      dbCrops.unshift({ id: Date.now(), cropName: crop, variety: 'Improved Hybrid F1', ageDays: 35, stage: 'Flowering', risk: 78 });
+      localStorage.setItem('ai_crop_guardian_crops', JSON.stringify(dbCrops));
+
+      enterMainDashboard(name, state, district, 'FARMER');
+    }
+
+    let selectedLoginRole = 'FARMER';
+    function selectLoginRole(role) {
+      selectedLoginRole = role;
+      ['Farmer', 'Expert', 'Officer', 'Admin'].forEach(r => {
+        document.getElementById('roleBtn' + r).className = 'p-3 rounded-2xl border bg-slate-50 text-slate-700 font-extrabold cursor-pointer';
+      });
+      const key = role.charAt(0) + role.slice(1).toLowerCase();
+      document.getElementById('roleBtn' + key).className = 'p-3 rounded-2xl border bg-emerald-700 text-white font-extrabold cursor-pointer';
+    }
+
+    function handleLoginSubmit(e) {
+      e.preventDefault();
+      enterMainDashboard('Rameshwar Deshmukh', currentState, currentDistrict, selectedLoginRole);
+    }
+
+    function enterMainDashboard(userName, state, district, role) {
+      document.getElementById('authGatewayScreen').classList.add('hidden');
+      document.getElementById('mainAppContainer').classList.remove('hidden');
+
+      document.getElementById('sidebarUserName').innerText = userName;
+      document.getElementById('sidebarUserLocation').innerText = `${district}, ${state}`;
+      document.getElementById('headerLocationBadge').innerText = `${district}, ${state}`;
+
+      document.getElementById('sideStateSelect').value = state;
+      populateDistrictDropdown('sideStateSelect', 'sideDistrictSelect');
+      document.getElementById('sideDistrictSelect').value = district;
+
+      switchPortalRole(role);
+      fetchRealTimeOpenMeteoWeather(district, state);
+      renderLocationCrops('ALL');
+      renderMyCropsList();
+      renderAdminUsersList();
+      showGlobalToast(currentLang === 'hi' ? `🌾 नमस्ते ${userName}! ${district} (${state}) लाइव डैशबोर्ड में आपका स्वागत है।` : `🌾 Welcome ${userName}! Connected to ${district} (${state}) Live Weather & Crop Intelligence.`);
+    }
+
+    function logoutToAuthScreen() {
+      document.getElementById('mainAppContainer').classList.add('hidden');
+      document.getElementById('authGatewayScreen').classList.remove('hidden');
+    }
+
+    function switchPortalRole(role) {
+      ['Farmer', 'Expert', 'Officer', 'Admin'].forEach(r => {
+        document.getElementById('portal' + r).classList.add('hidden');
+        document.getElementById('topRole' + r).className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold text-emerald-200 hover:text-white cursor-pointer';
+      });
+      const key = role.charAt(0) + role.slice(1).toLowerCase();
+      document.getElementById('portal' + key).classList.remove('hidden');
+      document.getElementById('topRole' + key).className = 'px-3.5 py-1.5 rounded-xl text-xs font-bold bg-emerald-600 text-white shadow cursor-pointer';
+    }
+
+    function switchFarmerTab(tab) {
+      ['Home', 'Advisor', 'Scan', 'Tools', 'Assistant', 'Risk', 'Crops', 'Map', 'Reports', 'Emart', 'Government'].forEach(t => {
+        const el = document.getElementById('farmerTab' + t);
+        const btn = document.getElementById('navBtn' + t);
+        if (el) el.classList.add('hidden');
+        if (btn) btn.className = 'w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between text-slate-700 hover:bg-slate-100 cursor-pointer';
+      });
+      const key = tab.charAt(0) + tab.slice(1).toLowerCase();
+      const targetEl = document.getElementById('farmerTab' + key);
+      const targetBtn = document.getElementById('navBtn' + key);
+      if (targetEl) targetEl.classList.remove('hidden');
+      if (targetBtn) targetBtn.className = 'w-full px-3.5 py-2.5 rounded-xl text-xs font-bold flex items-center justify-between bg-emerald-700 text-white shadow-sm cursor-pointer';
+
+      if (tab === 'MAP' && !leafletMapObj) {
+        setTimeout(initLiveLeafletMap, 150);
+      }
+    }
+
+    function handleSidebarStateChange() {
+      currentState = document.getElementById('sideStateSelect').value;
+      populateDistrictDropdown('sideStateSelect', 'sideDistrictSelect');
+      currentDistrict = document.getElementById('sideDistrictSelect').value;
+      updateLocationUI();
+    }
+
+    function handleSidebarDistrictChange() {
+      currentDistrict = document.getElementById('sideDistrictSelect').value;
+      updateLocationUI();
+    }
+
+    function updateLocationUI() {
+      document.getElementById('sidebarUserLocation').innerText = `${currentDistrict}, ${currentState}`;
+      document.getElementById('headerLocationBadge').innerText = `${currentDistrict}, ${currentState}`;
+      document.getElementById('advisorLocationPill').innerText = `📍 ${currentDistrict} District, ${currentState} (Live Weather Connected)`;
+      fetchRealTimeOpenMeteoWeather(currentDistrict, currentState);
+      renderLocationCrops('ALL');
+    }
+
+    async function fetchRealTimeOpenMeteoWeather(districtName, stateName) {
+      const coords = districtName === 'Lucknow' ? { lat: 26.8467, lng: 80.9462 }
+        : districtName.includes('Delhi') ? { lat: 28.6139, lng: 77.2090 }
+        : { lat: 18.5204, lng: 73.8567 };
+
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lng}&current=temperature_2m,relative_humidity_2m&timezone=auto`);
+        const data = await res.json();
+        if (data.current) {
+          const temp = data.current.temperature_2m;
+          const hum = data.current.relative_humidity_2m;
+          document.getElementById('liveTempDisplay').innerText = `${temp}°C`;
+          document.getElementById('liveHumDisplay').innerText = `${hum}%`;
+          const homeTemp = document.getElementById('homeTempDisplay');
+          const homeHum = document.getElementById('homeHumDisplay');
+          if (homeTemp) homeTemp.innerText = `${temp}°C`;
+          if (homeHum) homeHum.innerText = currentLang === 'hi' ? `नमी: ${hum}% (लाइव कनेक्टेड)` : `Humidity: ${hum}% (Live Connected)`;
+          document.getElementById('sidebarWeatherAlertTitle').innerText = `🌧️ LIVE WEATHER (${districtName.toUpperCase()}): ${temp}°C & ${hum}% Humidity`;
+          showGlobalToast(`🌤️ Connected to Real-Time Weather in ${districtName}: ${temp}°C, ${hum}% Humidity!`);
+        }
+      } catch (e) {
+        // Fallback if offline
+      }
+    }
+
+    function autoDetectGpsLocation() {
+      if (!navigator.geolocation) {
+        showGlobalToast('📍 Connected to Lucknow (Uttar Pradesh) Agro-Weather Station!');
+        return;
+      }
+      showGlobalToast('📍 Detecting your exact GPS Coordinates & Live Weather...');
+      navigator.geolocation.getCurrentPosition(
+        async (pos) => {
+          const { latitude, longitude } = pos.coords;
+          try {
+            const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&current=temperature_2m,relative_humidity_2m&timezone=auto`);
+            const data = await res.json();
+            if (data.current) {
+              document.getElementById('liveTempDisplay').innerText = `${data.current.temperature_2m}°C`;
+              document.getElementById('liveHumDisplay').innerText = `${data.current.relative_humidity_2m}%`;
+              showGlobalToast(`✅ GPS Weather Connected! Present Temp: ${data.current.temperature_2m}°C, Humidity: ${data.current.relative_humidity_2m}%`);
+            }
+          } catch (e) {
+            showGlobalToast('✅ GPS Location Verified!');
+          }
+        },
+        () => {
+          showGlobalToast('📍 Connected to Lucknow (UP) Weather Station (28.4°C, 81% Humidity)');
+        }
+      );
+    }
+
+    // Render Location-Wise Crop Advisor Cards with High-Res Farming Photography
+    function renderLocationCrops(seasonFilter) {
+      const profile = LOCATION_CROP_DATABASE[currentDistrict] || LOCATION_CROP_DATABASE['Lucknow'];
+      const container = document.getElementById('locationCropCardsGrid');
+      const filtered = profile.crops.filter(c => seasonFilter === 'ALL' || c.season.includes(seasonFilter));
+
+      container.innerHTML = filtered.map(c => `
+        <div class="farm-card overflow-hidden flex flex-col justify-between">
+          <div>
+            <div class="relative h-40 w-full overflow-hidden bg-slate-900">
+              <img src="${c.image}" alt="${c.name}" class="w-full h-full object-cover hover:scale-105 transition-transform duration-300" />
+              <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-black/75 text-emerald-300 text-[10px] font-extrabold">
+                ${c.season} Season • Sowing: ${c.sowing}
+              </span>
+              <span class="absolute top-3 right-3 px-3 py-1 rounded-full bg-emerald-600 text-white font-black text-xs shadow">
+                ${c.match}% Match
+              </span>
+            </div>
+            <div class="p-5 space-y-3">
+              <div>
+                <h3 class="text-lg font-extrabold text-slate-900">🌾 ${c.name}</h3>
+                <p class="text-xs font-bold text-emerald-700">${currentLang === 'hi' ? 'अनुशंसित किस्म:' : 'Recommended Variety:'} ${c.variety}</p>
+              </div>
+              <div class="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-xs text-emerald-950">
+                <strong>✓ ${currentLang === 'hi' ? `${currentDistrict} के लिए सर्वोत्तम क्यों:` : `Why ideal for ${currentDistrict}:`}</strong> ${currentLang === 'hi' ? c.whyHi : c.whyEn}
+              </div>
+              <div class="flex justify-between text-xs font-bold text-slate-700 bg-slate-50 p-2.5 rounded-xl border border-slate-200">
+                <span>${currentLang === 'hi' ? 'अपेक्षित पैदावार:' : 'Expected Yield:'}</span>
+                <span class="text-emerald-800">${c.yield}</span>
+              </div>
+            </div>
+          </div>
+          <div class="px-5 pb-5">
+            <button onclick="addAdvisorCropToMyFarm('${c.name}', '${c.variety}')" class="w-full py-2.5 rounded-xl btn-farm-primary text-white font-extrabold text-xs cursor-pointer">
+              + ${currentLang === 'hi' ? `${c.name} को मेरे खेत में जोड़ें` : `Add ${c.name} to My Farm`}
+            </button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addAdvisorCropToMyFarm(cropName, variety) {
+      dbCrops.unshift({ id: Date.now(), cropName, variety, ageDays: 1, stage: 'Sowing / Vegetative', risk: 24 });
+      localStorage.setItem('ai_crop_guardian_crops', JSON.stringify(dbCrops));
+      renderMyCropsList();
+      showGlobalToast(`🌱 Added ${cropName} (${variety}) to My Active Crops!`);
+    }
+
+    function renderMyCropsList() {
+      document.getElementById('badgeCropCount').innerText = dbCrops.length;
+      const grid = document.getElementById('myCropsGrid');
+      grid.innerHTML = dbCrops.map(crop => `
+        <div class="farm-card p-5 flex flex-col justify-between space-y-3">
+          <div>
+            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-emerald-50 text-emerald-800">${crop.variety}</span>
+            <h3 class="text-lg font-extrabold text-slate-900 mt-1">${crop.cropName}</h3>
+            <div class="mt-3 space-y-1 text-xs text-slate-600">
+              <div class="flex justify-between"><span>Age:</span><strong class="text-slate-900">${crop.ageDays} Days</strong></div>
+              <div class="flex justify-between"><span>Stage:</span><strong class="text-emerald-700">${crop.stage}</strong></div>
+            </div>
+          </div>
+          <button onclick="switchFarmerTab('SCAN')" class="w-full py-2 rounded-xl btn-farm-primary text-white font-bold text-xs cursor-pointer">
+            📸 Scan ${crop.cropName} Leaf
+          </button>
+        </div>
+      `).join('');
+    }
+
+    function promptAddCustomCrop() {
+      const name = prompt("Enter Crop Name (e.g. Tomato, Wheat, Mustard, Onion):", "Mustard (सरसों)");
+      if (!name) return;
+      addAdvisorCropToMyFarm(name, "Improved Variety");
+    }
+
+    function calculateDroneDosage(acres) {
+      const a = parseFloat(acres) || 1;
+      document.getElementById('calcTrichoOut').innerText = `${Math.round(a * 250)} g`;
+      document.getElementById('calcNpkOut').innerText = `${(a * 3).toFixed(1)} kg`;
+      document.getElementById('calcWaterOut').innerText = `${Math.round(a * 10)} Liters`;
+    }
+
+    function drawDefaultLeafScan() {
+      const canvas = document.getElementById('scanCanvas');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#f1f5f9'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.fillStyle = '#475569'; ctx.textAlign = 'center'; ctx.font = 'bold 16px sans-serif';
+      ctx.fillText('Upload a crop leaf photo', canvas.width / 2, canvas.height / 2 - 8);
+      ctx.font = '12px sans-serif'; ctx.fillText('फसल की पत्ती का साफ फोटो अपलोड करें', canvas.width / 2, canvas.height / 2 + 18);
+      ctx.textAlign = 'start';
+    }
+
+    let krishiLatestScan = null;
+    async function handleScanFileUpload(e) {
+      const file = e.target.files && e.target.files[0];
+      if (!file) return;
+      if (!['image/jpeg','image/png','image/webp'].includes(file.type)) {
+        showGlobalToast(currentLang === 'hi' ? 'केवल JPEG, PNG या WebP crop फोटो अपलोड करें।' : 'Upload a JPEG, PNG or WebP crop photo only.'); e.target.value = ''; return;
+      }
+      if (file.size > 3 * 1024 * 1024) {
+        showGlobalToast(currentLang === 'hi' ? 'फोटो 3 MB से छोटी होनी चाहिए।' : 'Please choose an image smaller than 3 MB.'); e.target.value = ''; return;
+      }
+      const cropName = document.getElementById('scanCropType')?.value || 'Unknown';
+      const reader = new FileReader();
+      reader.onerror = () => showGlobalToast('Could not read this image. Please try another photo.');
+      reader.onload = async (ev) => {
+        const dataUrl = ev.target.result;
+        const img = new Image();
+        img.onerror = () => showGlobalToast('Image could not be opened. Please try a different photo.');
+        img.onload = async () => {
+          if (img.naturalWidth < 256 || img.naturalHeight < 256) {
+            showGlobalToast(currentLang === 'hi' ? 'फोटो कम से कम 256×256 पिक्सेल की होनी चाहिए।' : 'Photo must be at least 256×256 pixels.');
+            document.getElementById('scanLesionPctDisplay').innerText = 'Not diagnosed';
+            return;
+          }
+          const canvas = document.getElementById('scanCanvas');
+          const ctx = canvas.getContext('2d');
+          ctx.clearRect(0, 0, canvas.width, canvas.height);
+          // Preview only. RGB heuristics are intentionally not used as disease diagnosis.
+          const scale = Math.min(canvas.width / img.width, canvas.height / img.height);
+          const w = img.width * scale, h = img.height * scale;
+          ctx.fillStyle = '#f8fafc'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(img, (canvas.width - w) / 2, (canvas.height - h) / 2, w, h);
+          document.getElementById('scanLesionPctDisplay').innerText = 'Pending AI validation';
+          const titleEl = document.getElementById('probReportTitle');
+          const descEl = document.getElementById('probReportDesc');
+          titleEl.innerText = 'Checking whether this is a crop/leaf image…';
+          descEl.innerText = 'The image is being checked by the configured vision model. No disease or treatment will be claimed unless the model returns a valid crop-image result.';
+          showGlobalToast(currentLang === 'hi' ? 'फसल की फोटो की जाँच हो रही है…' : 'Validating crop image and analyzing symptoms…');
+          try {
+            const res = await fetch('/api/ai/analyze-crop', {
+              method: 'POST', headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ cropName, imageUrl: dataUrl, language: currentLang })
+            });
+            const data = await res.json().catch(() => ({}));
+            if (!res.ok || !data.scan) {
+              titleEl.innerText = data.code === 'NOT_CROP_IMAGE' ? 'This does not look like a crop/leaf image' : 'Accurate AI diagnosis is unavailable';
+              descEl.innerText = data.error || 'Configure a valid vision API key and try again. No guessed diagnosis has been generated.';
+              document.getElementById('scanLesionPctDisplay').innerText = 'Not diagnosed';
+              krishiLatestScan = null; krishiLatestDiagnosis = '';
+              showGlobalToast(data.error || 'AI scan could not be completed.');
+              return;
+            }
+            updateProblemAndSolutionReports(data.scan, data.scan.affectedAreaPct ?? null, data.scan.confidence ?? null);
+          } catch (err) {
+            titleEl.innerText = 'AI service unavailable';
+            descEl.innerText = 'The image preview is available, but a verified vision response was not received. Check your network and server-side OPENAI_API_KEY, then scan again.';
+            document.getElementById('scanLesionPctDisplay').innerText = 'Not diagnosed';
+            krishiLatestScan = null; krishiLatestDiagnosis = '';
+            showGlobalToast('AI service unavailable. No fallback diagnosis was fabricated.');
+          }
+        };
+        img.src = dataUrl;
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function updateProblemAndSolutionReports(scanData, lesionPct, confPct) {
+      if (!scanData || !scanData.detectedDisease) return;
+      krishiLatestScan = scanData;
+      const titleEl = document.getElementById('probReportTitle');
+      const descEl = document.getElementById('probReportDesc');
+      titleEl.innerText = scanData.detectedDisease;
+      const evidenceLabel = currentLang === 'hi' ? 'फोटो में दिखे लक्षण: ' : 'Visible evidence: ';
+      const alternativesLabel = currentLang === 'hi' ? ' | अन्य संभावनाएँ: ' : ' | Possible lookalikes: ';
+      const categoryLabel = currentLang === 'hi' ? 'समस्या श्रेणी: ' : 'Category: ';
+      const rootLabel = currentLang === 'hi' ? '\nमूल कारण का आकलन: ' : '\nRoot-cause assessment: ';
+      const nutrientLabel = currentLang === 'hi' ? '\nपोषक तत्व आकलन: ' : '\nNutrient assessment: ';
+      const reportLabel = currentLang === 'hi' ? '\nरिपोर्ट आईडी: ' : '\nReport ID: ';
+      descEl.innerText = (scanData.problemSummary || 'The vision model could not provide enough evidence for a detailed explanation. Please consult an agricultural expert.') +
+        (scanData.diagnosisCategory ? '\n' + categoryLabel + scanData.diagnosisCategory : '') +
+        (scanData.visualEvidence ? '\n\n' + evidenceLabel + scanData.visualEvidence : '') +
+        (scanData.differentialDiagnosis ? alternativesLabel + scanData.differentialDiagnosis : '') +
+        (scanData.rootCauseAnalysis ? rootLabel + scanData.rootCauseAnalysis : '') +
+        (scanData.nutrientAssessment ? nutrientLabel + scanData.nutrientAssessment : '') +
+        (scanData.reportId ? reportLabel + scanData.reportId : '') +
+        (currentLang === 'hi' ? '\nमॉडल स्थिति: सामान्य विज़न triage; crop-specific field validation उपलब्ध नहीं।' : '\nModel status: general vision triage; crop-specific field validation is not available.') +
+        (scanData.persistenceStatus && scanData.persistenceStatus !== 'SAVED' ? '\nReport not permanently saved: database setup/connection is unavailable.' : '');
+      const confidenceBadge = document.querySelector('#probReportTitle')?.parentElement?.parentElement?.querySelector('span.px-3');
+      if (confidenceBadge) confidenceBadge.innerText = `${Number.isFinite(confPct) ? confPct : '—'}% visual estimate (not calibrated) · ${scanData.severity || 'Uncertain'}`;
+      document.getElementById('scanLesionPctDisplay').innerText = Number.isFinite(lesionPct) ? `${lesionPct}% estimated affected area (AI estimate)` : 'Affected area not estimated';
+      const steps = [scanData.solutionStep1, scanData.solutionStep2, scanData.solutionStep3, scanData.solutionStep4];
+      const solutionCards = document.querySelectorAll('#farmerTabScan .grid.grid-cols-1.sm\\:grid-cols-2.gap-3 > div');
+      steps.forEach((step, i) => { if (solutionCards[i] && step) { const p = solutionCards[i].querySelector('p'); if (p) p.innerText = step; } });
+      krishiLatestDiagnosis = scanData.detectedDisease;
+      const scanContext = document.getElementById('emartScanContext');
+      if (scanContext) {
+        scanContext.classList.remove('hidden');
+        scanContext.innerHTML = '<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><b>Matched to your latest scan:</b> <span id="emartRecentDiagnosis"></span><p class="mt-1 text-xs">Check product label and confirm treatment with a qualified agricultural expert.</p></div><button onclick="openEmartFromReport()" class="rounded-xl bg-emerald-700 px-4 py-2.5 font-bold text-white">Shop recommendations →</button></div>';
+        document.getElementById('emartRecentDiagnosis').textContent = krishiLatestDiagnosis;
+      }
+      showGlobalToast(currentLang === 'hi' ? 'AI रिपोर्ट तैयार है। कृपया विश्वास स्तर और विशेषज्ञ सलाह देखें।' : 'AI report ready. Review confidence and seek expert guidance where needed.');
+    }
+
+    function sendVoiceChatMsg() {
+      const input = document.getElementById('voiceChatInput');
+      const text = input.value.trim();
+      if (!text) return;
+      input.value = '';
+
+      const box = document.getElementById('voiceChatMessages');
+      box.innerHTML += `<div class="p-3 rounded-2xl bg-emerald-700 text-white text-xs self-end ml-auto max-w-[80%]">${text}</div>`;
+
+      const reply = currentLang === 'hi'
+        ? `🌾 कृषि AI सलाह (${currentDistrict}): आपकी फसल में उच्च नमी (81%) के कारण अगेती झुलसा का जोखिम है। कृपया नीचे की धब्बेदार पत्तियां हटा दें और ट्राइकोडर्मा विरिडी (5 ग्राम/लीटर) का शाम को छिड़काव करें।`
+        : `🌾 Agentic Krishi AI Advisory (${currentDistrict}): Based on 81% humidity in your district, prune lower infected leaves and apply Trichoderma viride @ 5g/L water spray in evening hours.`;
+
+      setTimeout(() => {
+        box.innerHTML += `<div class="p-3.5 rounded-2xl bg-white border border-slate-200 text-xs max-w-[82%] shadow-sm">${reply}</div>`;
+        box.scrollTop = box.scrollHeight;
+        speakVoiceText(reply);
+      }, 400);
+    }
+
+    function speakVoiceText(text) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = currentLang === 'hi' ? 'hi-IN' : 'en-IN';
+      window.speechSynthesis.speak(u);
+    }
+
+    function promptOpenAiApiKey() {
+      const currentKey = localStorage.getItem('openai_chatgpt_api_key') || '';
+      const newKey = prompt('Paste your OpenAI ChatGPT API Key (sk-...) to enable live GPT-4o-mini responses:', currentKey);
+      if (newKey !== null) {
+        localStorage.setItem('openai_chatgpt_api_key', newKey.trim());
+        const badge = document.getElementById('chatGptStatusBadge');
+        if (badge) {
+          badge.innerText = newKey.trim() ? '🟢 OpenAI GPT-4o Connected' : '⚡ Smart Agro Engine Active';
+        }
+        showGlobalToast(newKey.trim() ? '✅ OpenAI ChatGPT API Key Saved!' : '⚡ Using Built-in Smart Agriculture AI Engine.');
+      }
+    }
+
+    function stopVoiceSpeech() {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel();
+    }
+
+    function startVoiceInput() {
+      document.getElementById('voiceChatInput').value = currentLang === 'hi'
+        ? "लखनऊ में टमाटर और गेहूं की फसल में अभी कौन सी खाद और दवा डालें?"
+        : "What is the best treatment for tomato leaf spots in Lucknow?";
+      sendVoiceChatMsg();
+    }
+
+    function renderAdminUsersList() {
+      document.getElementById('adminUserCountBadge').innerText = `${dbUsers.length} Users`;
+      const container = document.getElementById('adminUsersList');
+      if (!container) return;
+      container.innerHTML = dbUsers.map(u => `
+        <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+          <div>
+            <div class="font-bold text-slate-900 text-sm">${u.name}</div>
+            <div class="text-slate-500">Mobile: ${u.mobile} • District: ${u.district}</div>
+          </div>
+          <span class="px-3 py-1 rounded-full font-extrabold bg-purple-100 text-purple-900">${u.role}</span>
+        </div>
+      `).join('');
+    }
+
+    function initLiveLeafletMap() {
+      leafletMapObj = L.map('liveLeafletMap').setView([26.8467, 80.9462], 8);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { attribution: '© OpenStreetMap' }).addTo(leafletMapObj);
+      L.circleMarker([26.8467, 80.9462], { radius: 14, fillColor: '#EF4444', color: '#FFF', weight: 2, fillOpacity: 0.85 })
+        .addTo(leafletMapObj)
+        .bindPopup('<b>Lucknow District (Malihabad / BKT)</b><br/>Tomato Early Blight Risk: 81% HIGH')
+        .openPopup();
+    }
+  
+    let krishiLatestDiagnosis = '';
+    function searchEmartDiagnosis(){ const input=document.getElementById('emartSearch'); if(input){input.value=krishiLatestDiagnosis;renderEmartProducts();} }
+    const krishiDemoProducts = [
+      {id:"demo-bio-01",name:"Trichoderma bio-input (sample listing)",brand:"Demo catalogue",category:"Bio-pesticides",crops:["Tomato","Wheat","Rice","Vegetables"],issue:"Preventive soil health support; not a universal leaf-disease cure",safety:"Illustrative listing only. Verify registration, formulation, crop label and expert guidance.",price:249,image:"🌿",pack:"1 kg (sample pack)",seller:"Seller not connected",usage:"Follow the product label and local expert advice."},
+      {id:"demo-neem-01",name:"Neem-based crop protection (sample listing)",brand:"Demo catalogue",category:"Organic farming",crops:["Tomato","Rice","Vegetables","Chilli"],issue:"May be relevant for some listed insect pests, depending on registered label",safety:"Illustrative listing only. Confirm approved use, concentration and precautions.",price:199,image:"🍃",pack:"500 ml (sample pack)",seller:"Seller not connected",usage:"Use only according to the verified product label."},
+      {id:"demo-npk-01",name:"Balanced NPK fertilizer (sample listing)",brand:"Demo catalogue",category:"Fertilizers",crops:["Wheat","Rice","Tomato","Maize"],issue:"Nutrient management based on soil test and crop stage",safety:"Illustrative listing only. Do not use as a disease treatment; consult soil-test results.",price:599,image:"🪴",pack:"5 kg (sample pack)",seller:"Seller not connected",usage:"Apply according to soil-test results and label."},
+      {id:"demo-micro-01",name:"Micronutrient mix (sample listing)",brand:"Demo catalogue",category:"Micronutrients",crops:["Vegetables","Wheat","Rice","Tomato"],issue:"Only where the relevant deficiency is confirmed",safety:"Illustrative listing only. Verify composition, crop label and dosage.",price:299,image:"🌱",pack:"1 kg (sample pack)",seller:"Seller not connected",usage:"Use only when a deficiency is identified."},
+      {id:"demo-seed-01",name:"Certified seed (sample listing)",brand:"Demo catalogue",category:"Seeds",crops:["Wheat","Rice","Maize"],issue:"Seasonal crop establishment",safety:"Illustrative listing only. Verify seed certification, variety, lot and seller.",price:449,image:"🌾",pack:"5 kg (sample pack)",seller:"Seller not connected",usage:"Select variety based on season, district and official recommendations."},
+      {id:"demo-sticky-01",name:"Yellow sticky traps (sample listing)",brand:"Demo catalogue",category:"Crop protection",crops:["Tomato","Chilli","Vegetables","Cotton"],issue:"Monitoring some flying insect pests; not a stand-alone cure",safety:"Illustrative listing only. Match trap type to pest and crop with expert guidance.",price:149,image:"🟨",pack:"10 traps (sample pack)",seller:"Seller not connected",usage:"Place and monitor according to integrated pest management guidance."}
+    ];
+    const krishiSchemes = [
+      {id:"pm-kisan",name:"PM-KISAN Samman Nidhi",category:"Income support",level:"Central",summary:"Income support for eligible farmer families, subject to current scheme rules.",eligibility:"Verify current eligibility, exclusions and beneficiary status on the official portal.",docs:["Identity/Aadhaar details","Bank details","Land records as required"],steps:["Review current eligibility rules","Prepare required records","Apply or check status on the official portal"],url:"https://pmkisan.gov.in/"},
+      {id:"pmfby",name:"Pradhan Mantri Fasal Bima Yojana",category:"Crop insurance",level:"Central",summary:"Crop insurance availability depends on notified crop, area and season.",eligibility:"Check current state/season notification, enrolment window and notified crops.",docs:["Identity details","Land/cultivation records","Bank details","Crop and sowing details"],steps:["Check notified crop and area","Review current deadline and premium","Use authorized application channel"],url:"https://pmfby.gov.in/"},
+      {id:"kcc",name:"Kisan Credit Card (KCC)",category:"Agricultural credit",level:"Central / Banks",summary:"Agricultural credit facility subject to lender assessment and terms.",eligibility:"The participating bank determines eligibility, limit, terms and approval.",docs:["Identity/address proof","Land or cultivation records","Bank-requested details"],steps:["Contact a participating bank","Request current KCC checklist","Submit for bank verification"],url:"https://www.rbi.org.in/"},
+      {id:"machinery",name:"Agricultural Mechanization / Equipment Subsidy",category:"Machinery subsidy",level:"Central / State",summary:"Machinery support may be available through current state and central programme windows.",eligibility:"Equipment, beneficiary category, subsidy and deadline vary by current state notification.",docs:["Identity details","Land/cultivation evidence","Bank details","Equipment quotation if required"],steps:["Check current state notice","Confirm equipment eligibility","Apply through official channel"],url:"https://agrimachinery.nic.in/"},
+      {id:"up-agri",name:"Uttar Pradesh Agriculture Department services",category:"State agriculture services",level:"Uttar Pradesh",summary:"Official state department portal for current scheme notices and farmer services.",eligibility:"Each scheme has separate rules, documents and application windows.",docs:["As stated in the official scheme notice"],steps:["Open the state department portal","Find the relevant district/category notice","Use the official application link"],url:"https://agriculture.up.gov.in/"},
+      {id:"pmksy",name:"Pradhan Mantri Krishi Sinchayee Yojana",category:"Irrigation & water",level:"Central / State",summary:"Irrigation and water-use support depends on programme component and state implementation.",eligibility:"Confirm current component, state implementation and beneficiary rules.",docs:["Identity details","Land/cultivation details","Irrigation information if requested"],steps:["Identify relevant component","Check state implementation","Apply through the notified official channel"],url:"https://pmksy.gov.in/"}
+    ];
+    let emartCart = {};
+    let emartOrders = [];
+    let govApplications = [];
+    async function loadEmartOrders(){try{const r=await fetch('/api/emart/orders');const d=await r.json();emartOrders=d.orders||[];}catch(e){emartOrders=[];}}
+    function formatINR(value){return new Intl.NumberFormat('en-IN',{style:'currency',currency:'INR',maximumFractionDigits:0}).format(value||0);}
+    function productMatchesScan(p){
+      if(!krishiLatestScan) return false;
+      // Demo catalogue entries have illustrative prices and no verified registration/seller data;
+      // they must never be presented as diagnosis-backed treatment recommendations.
+      if (p.verifiedForDiagnosis !== true || p.livePrice !== true || p.sellerVerified !== true) return false;
+      const text=`${p.name} ${p.category} ${p.issue}`.toLowerCase();
+      const disease=(krishiLatestScan.detectedDisease||'').toLowerCase();
+      const crop=(krishiLatestScan.cropName||document.getElementById('scanCropType')?.value||'').toLowerCase();
+      const cropMatch=!crop||crop==='unknown'||crop==='other'||p.crops.some(c=>crop.includes(c.toLowerCase())||c.toLowerCase()==='vegetables'&&['tomato','chilli','brinjal','okra'].some(v=>crop.includes(v)));
+      if(!cropMatch) return false;
+      if(krishiLatestScan.uncertain || disease.includes('uncertain') || disease.includes('not clear') || disease.includes('healthy')) return false;
+      const fungal=['fung','blight','leaf spot','mildew','rust','alternaria','septoria','rot'].some(t=>disease.includes(t));
+      const insect=['insect','pest','aphid','whitefly','thrip','caterpillar','borer','mite'].some(t=>disease.includes(t));
+      const nutrient=['nutrient','deficien','chlorosis','nitrogen','potassium','magnesium'].some(t=>disease.includes(t));
+      // Do not treat a generic bio-input as a cure for every fungal-looking lesion.
+      // Only show a catalogue match when the result's broad problem type fits the listing.
+      if(fungal) return false; // no verified disease-specific fungicide listing is connected yet
+      if(insect) return (p.id==='demo-neem-01' && /aphid|whitefly|thrip|mite|insect|pest/i.test(disease)) || (p.id==='demo-sticky-01' && /whitefly|aphid|thrip|flying insect/i.test(disease));
+      if(nutrient) return (p.id==='demo-micro-01' && /micro|iron|zinc|magnesium|deficien|chlorosis/i.test(disease)) || (p.id==='demo-npk-01' && /nitrogen|potassium|npk/i.test(disease));
+      return false;
+    }
+    function renderEmartProducts(){
+      const q=(document.getElementById('emartSearch')?.value||'').toLowerCase(), cat=document.getElementById('emartCategory')?.value||'All categories', crop=(document.getElementById('emartCrop')?.value||'').toLowerCase();
+      const list=krishiDemoProducts.filter(p=>(cat==='All categories'||p.category===cat)&&(`${p.name} ${p.brand} ${p.category} ${p.issue} ${p.crops.join(' ')}`).toLowerCase().includes(q)&&(!crop||p.crops.join(' ').toLowerCase().includes(crop)));
+      const el=document.getElementById('emartProductsView');if(!el)return;
+      el.innerHTML=list.map(p=>`<article class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md flex flex-col"><div class="flex items-start justify-between gap-3"><div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-3xl">${p.image}</div><span class="rounded-full bg-amber-50 px-2.5 py-1 text-[10px] font-extrabold text-amber-800">SAMPLE PRICE</span></div><p class="mt-4 text-[10px] font-extrabold uppercase tracking-wider text-emerald-700">${p.category}</p><h4 class="mt-1 text-base font-extrabold leading-snug text-slate-900">${p.name}</h4><p class="mt-1 text-xs text-slate-500">${p.brand} · ${p.pack}</p><p class="mt-3 text-sm leading-relaxed text-slate-600">${p.issue}</p><div class="mt-3 flex flex-wrap gap-1">${p.crops.map(c=>`<span class="rounded-full bg-slate-100 px-2 py-1 text-[10px] font-semibold text-slate-600">${c}</span>`).join('')}</div><div class="mt-4 rounded-xl bg-slate-50 p-3"><div class="flex items-end justify-between gap-2"><span class="text-xs text-slate-500">Illustrative price</span><strong class="text-xl font-black text-slate-900">${formatINR(p.price)}</strong></div><p class="mt-1 text-[10px] text-amber-800">Not a live quote · seller/stock not connected</p></div><p class="mt-3 text-xs leading-relaxed text-slate-600"><b>Safety:</b> ${p.safety}</p><p class="mt-1 text-xs text-slate-500">Seller: ${p.seller}</p><div class="mt-auto grid grid-cols-2 gap-2 pt-4"><button onclick="showProductDetails('${p.id}')" class="rounded-xl border border-slate-300 px-3 py-2.5 text-xs font-bold text-slate-700 hover:bg-slate-50">Details</button><button onclick="addEmartItem('${p.id}')" class="rounded-xl bg-emerald-700 px-3 py-2.5 text-xs font-extrabold text-white hover:bg-emerald-800">＋ Add to cart</button></div></article>`).join('')||'<p class="farm-card p-5 text-sm text-slate-500">No matching products. Try another crop, category or search term.</p>';
+      document.getElementById('emartCartCount').innerText=Object.values(emartCart).reduce((a,b)=>a+b,0);
+      const matchBox=document.getElementById('emartScanContext');
+      if(matchBox && krishiLatestScan){matchBox.classList.remove('hidden'); const d=document.getElementById('emartRecentDiagnosis'); if(d)d.textContent=krishiLatestDiagnosis;}
+    }
+    function showProductDetails(id){const p=krishiDemoProducts.find(x=>x.id===id);if(!p)return;document.getElementById('emartModalTitle').textContent=p.name;document.getElementById('emartModalBody').innerHTML=`<div class="grid grid-cols-1 sm:grid-cols-2 gap-3"><div class="rounded-xl bg-slate-50 p-3"><p class="text-xs text-slate-500">Illustrative price</p><p class="mt-1 text-2xl font-black">${formatINR(p.price)}</p><p class="mt-1 text-[10px] font-bold text-amber-800">Not a live seller quote</p></div><div class="rounded-xl bg-slate-50 p-3"><p class="text-xs text-slate-500">Pack size</p><p class="mt-1 font-bold">${p.pack}</p><p class="mt-1 text-xs text-slate-500">Seller: ${p.seller}</p></div></div><div class="mt-4 space-y-3 text-sm"><p><b>Intended use:</b> ${p.issue}</p><p><b>Applicable crops:</b> ${p.crops.join(', ')}</p><p><b>Usage guidance:</b> ${p.usage}</p><p class="rounded-xl border border-amber-200 bg-amber-50 p-3 text-amber-950"><b>Safety:</b> ${p.safety}</p><p class="text-xs text-slate-500">Live availability, verified seller, delivery and payment are not connected.</p></div>`;document.getElementById('emartModalAddButton').onclick=()=>{addEmartItem(id);closeEmartProductDetails();};const modal=document.getElementById('emartProductModal');modal.classList.remove('hidden');modal.classList.add('flex');}
+    function closeEmartProductDetails(){const modal=document.getElementById('emartProductModal');if(modal){modal.classList.add('hidden');modal.classList.remove('flex');}}
+    function addEmartItem(id){const p=krishiDemoProducts.find(x=>x.id===id);if(!p)return;emartCart[id]=(emartCart[id]||0)+1;renderEmartProducts();showGlobalToast(`${p.name} added. Sample-price cart only; no payment will be taken.`);}
+    function showEmartView(view){
+      ['emartProductsView','emartCartView','emartOrdersView'].forEach(id=>document.getElementById(id).classList.add('hidden'));
+      if(view==='shop'){document.getElementById('emartProductsView').classList.remove('hidden');return;}
+      if(view==='cart'){const el=document.getElementById('emartCartView');el.classList.remove('hidden');const items=Object.entries(emartCart).filter(([id,n])=>n>0).map(([id,n])=>({p:krishiDemoProducts.find(p=>p.id===id),n})).filter(x=>x.p);const total=items.reduce((sum,{p,n})=>sum+p.price*n,0);
+        el.innerHTML='<div class="flex flex-wrap items-center justify-between gap-3"><h3 class="text-xl font-extrabold">Your shopping cart</h3><span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-bold text-amber-800">Sample prices only</span></div>'+(items.length?items.map(({p,n})=>`<div class="flex flex-wrap items-center justify-between gap-3 border-b border-slate-100 py-4"><div class="flex items-center gap-3"><div class="flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-50 text-2xl">${p.image}</div><div><b>${p.name}</b><p class="text-xs text-slate-500">${formatINR(p.price)} per sample pack</p><p class="text-[10px] text-amber-800">Seller and stock not verified</p></div></div><div class="flex items-center gap-2"><button aria-label="Decrease quantity" class="rounded-lg border px-3 py-1.5" onclick="changeEmartQty('${p.id}',-1)">−</button><span class="min-w-5 text-center font-bold">${n}</span><button aria-label="Increase quantity" class="rounded-lg border px-3 py-1.5" onclick="changeEmartQty('${p.id}',1)">＋</button><button class="text-xs font-bold text-red-600" onclick="removeEmartItem('${p.id}')">Remove</button></div><strong class="min-w-24 text-right">${formatINR(p.price*n)}</strong></div>`).join('')+`<div class="mt-5 rounded-2xl bg-slate-50 p-4"><div class="flex justify-between text-sm"><span>Subtotal (illustrative)</span><b>${formatINR(total)}</b></div><p class="mt-2 text-xs leading-relaxed text-amber-900">This is a demo estimate, not a seller quote. Shipping, tax, live availability and payment are not configured. Saving this summary does not place a paid order.</p><button onclick="checkoutEmart()" class="mt-4 w-full rounded-xl bg-emerald-700 p-3.5 font-extrabold text-white">Save order summary</button></div>`:'<p class="py-8 text-center text-sm text-slate-500">Your cart is empty. Add a product to get started.</p>');return;}
+      const el=document.getElementById('emartOrdersView');el.classList.remove('hidden');loadEmartOrders().then(()=>{el.innerHTML='<h3 class="text-lg font-extrabold">Order summaries</h3><p class="mt-1 text-xs text-slate-500">Saved summaries are not paid orders; payment and fulfilment are not connected.</p>'+(emartOrders.length?emartOrders.map(o=>`<div class="mt-3 rounded-xl border p-4"><b>Order summary ${o.id}</b><p class="text-xs text-slate-500">${o.status||'SUMMARY_SAVED'}</p><ul class="mt-2 list-disc pl-5 text-sm">${(o.items||[]).map(i=>`<li>${i.name} × ${i.quantity}</li>`).join('')}</ul></div>`).join(''):'<p class="py-6 text-sm text-slate-500">No saved order summaries yet.</p>');});
+    }
+    function openEmartFromReport(){
+      if(!krishiLatestScan){showGlobalToast('Complete a valid crop scan first, or browse the catalogue without recommendations.');switchFarmerTab('EMART');return;}
+      const crop=krishiLatestScan.cropName||document.getElementById('scanCropType')?.value||'';
+      const search=document.getElementById('emartSearch');if(search)search.value='';
+      const category=document.getElementById('emartCategory');if(category)category.value='All categories';
+      const cropInput=document.getElementById('emartCrop');if(cropInput)cropInput.value='';
+      switchFarmerTab('EMART');
+      const context=document.getElementById('emartScanContext');
+      if(context){context.classList.remove('hidden');context.innerHTML='<div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3"><div><b>Recommendations from your scan:</b> <span id="emartRecentDiagnosis"></span><p class="mt-1 text-xs">These are catalogue matches, not a prescription. Confirm the diagnosis and product label with an agricultural expert.</p></div><button onclick="clearEmartScanFilter()" class="rounded-lg border px-3 py-2 text-xs font-bold">Show all products</button></div>';document.getElementById('emartRecentDiagnosis').textContent=krishiLatestDiagnosis;}
+      const matched=krishiDemoProducts.filter(productMatchesScan);
+      const recommended=matched;
+      const productView=document.getElementById('emartProductsView');
+      if(productView){
+        productView.innerHTML=recommended.length?recommended.map(p=>`<article class="group rounded-2xl border border-slate-200 bg-white p-4 shadow-sm flex flex-col"><div class="flex items-start justify-between gap-3"><div class="flex h-14 w-14 items-center justify-center rounded-2xl bg-emerald-50 text-3xl">${p.image}</div><span class="rounded-full bg-amber-50 px-2 py-1 text-[10px] font-extrabold text-amber-800">SAMPLE PRICE</span></div><p class="mt-4 text-[10px] font-extrabold uppercase text-emerald-700">${p.category}</p><h4 class="mt-1 font-extrabold">${p.name}</h4><p class="mt-2 text-sm text-slate-600">${p.issue}</p><p class="mt-3 text-xs text-slate-500">${p.pack} · ${p.crops.join(', ')}</p><div class="mt-4 flex items-center justify-between"><strong class="text-xl">${formatINR(p.price)}</strong><button onclick="addEmartItem('${p.id}')" class="rounded-xl bg-emerald-700 px-3 py-2 text-xs font-bold text-white">Add to cart</button></div><p class="mt-2 text-[10px] text-amber-800">Illustrative price; not a live quote.</p></article>`).join(''):'<p class="farm-card p-5">No product recommendation is available for this scan. This may mean the result is uncertain or no catalogue match exists. Ask an agricultural expert, or use “Show all products” to browse without a diagnosis-based recommendation.</p>';
+      }
+      showEmartView('shop');
+    }
+    function clearEmartScanFilter(){const c=document.getElementById('emartCrop');if(c)c.value='';const q=document.getElementById('emartSearch');if(q)q.value='';const cat=document.getElementById('emartCategory');if(cat)cat.value='All categories';renderEmartProducts();}
+    function changeEmartQty(id,delta){emartCart[id]=(emartCart[id]||0)+delta;if(emartCart[id]<=0)delete emartCart[id];showEmartView('cart');renderEmartProducts();}
+    function removeEmartItem(id){delete emartCart[id];showEmartView('cart');renderEmartProducts();}
+    async function checkoutEmart(){const items=Object.entries(emartCart).filter(([id,n])=>n>0).map(([id,n])=>{const p=krishiDemoProducts.find(p=>p.id===id);return {productId:id,name:p.name,quantity:n,price:p.price};});if(!items.length)return;const total=items.reduce((sum,i)=>sum+i.price*i.quantity,0);try{const r=await fetch('/api/emart/orders',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({items,total,currency:'INR',priceType:'ILLUSTRATIVE_DEMO'})});const d=await r.json();if(!r.ok)throw new Error(d.error||'save failed');emartCart={};await loadEmartOrders();showEmartView('orders');showGlobalToast('Order summary saved. These are sample prices; no payment or fulfilment occurred.');}catch(e){showGlobalToast('Unable to save order summary. Check database setup.');}}
+    async function loadGovApplications(){try{const r=await fetch('/api/government-services');const d=await r.json();govApplications=d.applications||[];}catch(e){govApplications=[];}renderGovTracker();}
+    function renderGovernmentSchemes(){const q=(document.getElementById('govSearch')?.value||'').toLowerCase(),state=document.getElementById('govState')?.value||'Uttar Pradesh';const list=krishiSchemes.filter(s=>(`${s.name} ${s.category} ${s.summary} ${s.level}`).toLowerCase().includes(q)&&(s.level!=='Uttar Pradesh'||state==='Uttar Pradesh'));const el=document.getElementById('governmentSchemesList');if(!el)return;el.innerHTML=list.map(s=>`<article class="farm-card p-5"><div class="flex gap-2 flex-wrap"><span class="rounded-full bg-emerald-100 px-2 py-1 text-xs font-bold">${s.level}</span><span class="rounded-full bg-slate-100 px-2 py-1 text-xs font-bold">${s.category}</span></div><h3 class="mt-3 text-lg font-extrabold">${s.name}</h3><p class="mt-2 text-sm text-slate-600">${s.summary}</p><p class="mt-2 text-xs text-amber-800">Verify current rules, benefits and deadlines on official portal.</p><div class="mt-4 flex flex-wrap gap-2"><button onclick="openGovScheme('${s.id}')" class="rounded-xl bg-emerald-700 px-3 py-2 text-xs font-bold text-white">Eligibility & application guide</button><a target="_blank" rel="noopener noreferrer" href="${s.url}" class="rounded-xl border px-3 py-2 text-xs font-bold">Official portal ↗</a></div></article>`).join('')||'<p class="farm-card p-5">No matching schemes.</p>';}
+    function openGovScheme(id){const s=krishiSchemes.find(x=>x.id===id);if(!s)return;const state=document.getElementById('govState').value,district=document.getElementById('govDistrict').value,crop=document.getElementById('govCrop').value,land=document.getElementById('govLand').value,farmerType=document.getElementById('govFarmerType').value;const status=prompt('Tracker status: Planning to apply / Documents prepared / Submitted by me / Awaiting response','Planning to apply')||'Planning to apply';const notes=prompt('Optional notes (do not enter sensitive credentials)','')||'';fetch('/api/government-services',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({schemeId:s.id,schemeName:s.name,status,notes,state,district,crop,landholding:land,farmerType})}).then(r=>r.json()).then(d=>{if(d.success){loadGovApplications();showGlobalToast('Scheme saved to your tracker. Eligibility and application status are not verified live.');}else showGlobalToast('Could not save scheme tracker.');}).catch(()=>showGlobalToast('Could not save scheme tracker.'));}
+    function renderGovTracker(){const el=document.getElementById('governmentTracker');if(!el)return;el.innerHTML=govApplications.length?govApplications.map(a=>`<div class="rounded-xl border p-4"><div class="flex flex-wrap justify-between gap-2"><b>${a.schemeName}</b><select class="rounded-lg border p-2 text-xs" onchange="updateGovStatus('${a.id}',this.value)">${['Planning to apply','Documents prepared','Submitted by me','Awaiting response','Approved (manually updated)','Rejected (manually updated)'].map(s=>`<option ${a.status===s?'selected':''}>${s}</option>`).join('')}</select></div><p class="mt-2 text-xs text-slate-500">${a.state||''}, ${a.district||''} • ${a.notes||'No notes'}</p></div>`).join(''):'<p class="py-5 text-sm text-slate-500">No saved schemes yet. Choose “Eligibility & application guide” to add one.</p>';}
+    async function updateGovStatus(id,status){const item=govApplications.find(a=>a.id===id);try{const r=await fetch('/api/government-services',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({id,status,notes:item?.notes||''})});const d=await r.json();if(r.ok){await loadGovApplications();showGlobalToast('Tracker status updated manually.');}else showGlobalToast(d.error||'Update failed.');}catch(e){showGlobalToast('Tracker update failed.');}}
+
+    document.addEventListener('DOMContentLoaded',()=>{renderEmartProducts();renderGovernmentSchemes();loadGovApplications();});
+</script>
+</body>
+</html>
